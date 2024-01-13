@@ -1,0 +1,1 @@
+A repository where I'm learning Plotly through beginner-level programs. Here, you'll find my journey with interactive data visualizations, one plot at a time. Join me in exploring the basics of Plotly!
