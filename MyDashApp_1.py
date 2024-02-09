@@ -195,7 +195,7 @@ app.layout = dbc.Container([
 
             # Box 2 C2
             html.Div([
-                html.Button('Generate Vaialbes',
+                html.Button('Generate Variables',
                     id = 'Button_1', 
                     className = "btn btn-secondary btn-lg col-12",
                     style = {
