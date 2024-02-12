@@ -116,10 +116,12 @@ app.layout = dbc.Container([
                         'margin': '5%',
                         }),
 
-                ],style = {
+                ],id = 'box2',
+                style = {
                     'borderWidth': '1px',
                     'borderStyle': 'solid',
                     'borderRadius': '5px',
+                    'display':'none'
                     }),
 
             html.Br(),
@@ -341,23 +343,24 @@ app.layout = dbc.Container([
 # App Callbacks - Providing Functionality
 
 @app.callback(    
-    Output(component_id = 'output', component_property = 'value'),
-    Input(component_id = 'Button_1', component_property = 'n_clicks'),
-    Input(component_id = 'Button_2', component_property = 'n_clicks'),
-    Input(component_id = 'Button_3', component_property = 'n_clicks'),
+    Output(component_id = 'box2', component_property = 'style'),
+    #Input(component_id = 'Button_1', component_property = 'n_clicks'),
+    #Input(component_id = 'Button_2', component_property = 'n_clicks'),
+    #Input(component_id = 'Button_3', component_property = 'n_clicks'),
 
-    State(component_id = 'database-selection', component_property = 'value'),
-    State(component_id = 'version-selection', component_property = 'value'),
-    State(component_id = 'time-step', component_property = 'value'),
-    State(component_id = 'buildingType-selection', component_property = 'value'),
+    Input(component_id = 'database_selection', component_property = 'value'),
+    #State(component_id = 'version-selection', component_property = 'value'),
+    #State(component_id = 'time-step', component_property = 'value'),
+    #State(component_id = 'buildingType-selection', component_property = 'value'),
 
     prevent_initial_call = False)
 
-def CreateOutput():
+def CreateOutput(database):
     
-    output = 1
-
-    return output
+    if database == 1:
+        return {'display':'block'}
+    else:
+        return {'display':'none'}
     
 # Running the App
  
