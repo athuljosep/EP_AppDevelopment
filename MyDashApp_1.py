@@ -55,7 +55,7 @@ app.layout = dbc.Container([
                     {'label' : " Our Database", 'value' : 1},
                     {'label' : " Your Files", 'value' : 2}
                     ]  ,
-                value = 1,
+                value = '',
                 className = 'ps-4 p-3',
                 style = {
                     'width': '100%',
@@ -104,8 +104,8 @@ app.layout = dbc.Container([
                 dbc.Stack([
                     html.Label("Energy Plus Version:",
                         className = 'text'),
-                    dcc.Dropdown(['8.0.0','9.0.0','22.0.0','23.0.0'], '9.0.0',
-                        id='version-selection',
+                    dcc.Dropdown(['8.0.0','9.0.0','22.0.0','23.0.0'], '',
+                        id='version_selection',
                         style = {
                             'width':'60%',
                             'margin-left':'8%'
@@ -116,12 +116,13 @@ app.layout = dbc.Container([
                         'margin': '5%',
                         }),
 
-                ],id = 'box2',
+                ],id = 'upload_files',
+                hidden = True,
                 style = {
                     'borderWidth': '1px',
                     'borderStyle': 'solid',
                     'borderRadius': '5px',
-                    'display':'none'
+                    #'display':'none'
                     }),
 
             html.Br(),
@@ -147,8 +148,8 @@ app.layout = dbc.Container([
                 dbc.Stack([
                     html.Label("Simulation Reporting Frequency:",
                         className = 'text'), 
-                    dcc.Dropdown(['timestep','hourly','detailed','daily','monthly','runperiod','environment','annual'], 'timestep',
-                        id = 'simReportFreq-selection',
+                    dcc.Dropdown(['timestep','hourly','detailed','daily','monthly','runperiod','environment','annual'], '',
+                        id = 'simReportFreq_selection',
                         style = {
                             'width':'70%',
                             'margin':'2%'
@@ -159,7 +160,9 @@ app.layout = dbc.Container([
                         'margin': '5%',
                         }), 
 
-                ],style = {
+                ],id = 'simulation_details',
+                hidden = True,
+                style = {
                     'borderWidth': '1px',
                     'borderStyle': 'solid',
                     'borderRadius': '5px',
@@ -187,7 +190,9 @@ app.layout = dbc.Container([
                     className = 'ms-2'),
                 html.H6("Heat/Cool Setpoint",
                     className = 'ms-2'),
-                ],style = {
+                ],id = 'schedules',
+                hidden = True,
+                style = {
                     'borderWidth': '1px',
                     'borderStyle': 'solid',
                     'borderRadius': '5px',
@@ -206,14 +211,16 @@ app.layout = dbc.Container([
                         },),
 
                 dcc.Dropdown(['var 1','var 2','var 3'], '',
-                    id = 'variable-selection',
+                    id = 'variable_selection',
                     style = {
                         'width':'95%',
                         'margin-left':'2.5%',
                         'margin-bottom':'5%'
                         }),
                 
-                ],style = {
+                ],id = 'generate_variables',
+                hidden = True,
+                style = {
                     'borderWidth': '1px',
                     'borderStyle': 'solid',
                     'borderRadius': '5px',
@@ -224,14 +231,16 @@ app.layout = dbc.Container([
             # Box 3 C2
             html.Div([
 
-                dcc.Checklist([' Simulation Variables',' EIO',' IDF Object Records'],
-                    id = 'download-selection',
+                dcc.Checklist([' Simulation Variables',' EIO',' IDF Object Records'],'',
+                    id = 'download_selection',
                     style = {
                         'width':'95%',
                         'margin':'5%',
                     }),
                 
-                ],style = {
+                ],id = 'download_variables',
+                hidden = True,
+                style = {
                     'borderWidth': '1px',
                     'borderStyle': 'solid',
                     'borderRadius': '5px',
@@ -252,7 +261,7 @@ app.layout = dbc.Container([
                 html.Label("Building Type",
                     className = 'text-left ms-4 mt-1'),
                 dcc.Dropdown(['Commercial','Manufactured','Residential'], 'Commercial',
-                    id='buildingType-selection',
+                    id='buildingType_selection',
                     style = {
                         'width': '95%',
                         'margin-left': '2.5%',   
@@ -262,7 +271,7 @@ app.layout = dbc.Container([
                 html.Label("IDF Type",
                     className = 'text-left ms-4'),
                 dcc.Dropdown(['ASHRAE','IECC'], 'IECC',
-                    id = 'idfType-selection',
+                    id = 'idfType_selection',
                     style = {
                         'width': '95%',
                         'margin-left': '2.5%',   
@@ -272,7 +281,7 @@ app.layout = dbc.Container([
                 html.Label("IDF Year",
                     className = 'text-left ms-4'),
                 dcc.Dropdown(['2012','2013','2015','2016','2018','2019'], '2013',
-                    id='idfYear-selection',
+                    id='idfYear_selection',
                     style = {
                         'width': '95%',
                         'margin-left': '2.5%',   
@@ -282,7 +291,7 @@ app.layout = dbc.Container([
                 html.Label("Building",
                     className = 'text-left ms-4'),
                 dcc.Dropdown(['ApartmentHighRise','Hospital','HotelLarge','HotelSmall','OfficeLarge','OfficeMedium','OfficeSmall'], 'OfficeSmall',         
-                    id = 'building-selection',
+                    id = 'building_selection',
                     style = {
                         'width': '95%',
                         'margin-left': '2.5%',   
@@ -291,15 +300,17 @@ app.layout = dbc.Container([
                 # Location selection
                 html.Label("Location",
                     className = 'text-left ms-4'),
-                dcc.Dropdown(['Albuquerque','Atlanta','Buffalo','Denver','ElPaso','Fairbanks','GreatFalls','Honululu','InternationalFalls','NewYork','PortAngeles','Rochester','SanDiego','Seattle','Tampa','Tucson'], 'Seattle',
-                    id = 'location-selection',
+                dcc.Dropdown(['Albuquerque','Atlanta','Buffalo','Denver','ElPaso','Fairbanks','GreatFalls','Honululu','InternationalFalls','NewYork','PortAngeles','Rochester','SanDiego','Seattle','Tampa','Tucson'], '',
+                    id = 'location_selection',
                     style = {
                         'width': '95%',
                         'margin-left': '2.5%',
                         'margin-bottom': '3%',   
                         },),
 
-                ],style = {
+                ],id = 'building_details',
+                hidden = True,
+                style = {
                     'borderWidth': '1px',
                     'borderStyle': 'solid',
                     'borderRadius': '5px',
@@ -327,7 +338,9 @@ app.layout = dbc.Container([
                         'margin-bottom':'5%'
                         },),
                 
-                ],style = {
+                ],id = 'final_download',
+                hidden = True,
+                style = {
                     'borderWidth': '1px',
                     'borderStyle': 'solid',
                     'borderRadius': '5px',
@@ -343,25 +356,69 @@ app.layout = dbc.Container([
 # App Callbacks - Providing Functionality
 
 @app.callback(    
-    Output(component_id = 'box2', component_property = 'style'),
+    Output(component_id = 'upload_files', component_property = 'hidden'),
+    Output(component_id = 'simulation_details', component_property = 'hidden'),
+    Output(component_id = 'schedules', component_property = 'hidden'),
+    Output(component_id = 'generate_variables', component_property = 'hidden'),
+    Output(component_id = 'download_variables', component_property = 'hidden'),
+    Output(component_id = 'building_details', component_property = 'hidden'),
+    Output(component_id = 'final_download', component_property = 'hidden'),
     #Input(component_id = 'Button_1', component_property = 'n_clicks'),
     #Input(component_id = 'Button_2', component_property = 'n_clicks'),
     #Input(component_id = 'Button_3', component_property = 'n_clicks'),
 
     Input(component_id = 'database_selection', component_property = 'value'),
-    #State(component_id = 'version-selection', component_property = 'value'),
+    Input(component_id = 'version_selection', component_property = 'value'),
+    Input(component_id = 'location_selection', component_property = 'value'),
+    Input(component_id = 'simReportFreq_selection', component_property = 'value'),
+    Input(component_id = 'variable_selection', component_property = 'value'),
+    Input(component_id = 'download_selection', component_property = 'value'),
     #State(component_id = 'time-step', component_property = 'value'),
     #State(component_id = 'buildingType-selection', component_property = 'value'),
 
     prevent_initial_call = False)
 
-def CreateOutput(database):
+def CreateOutput(database_selection, version_selection, location_selection, simReportFreq_selection, variable_selection, download_selection):
     
-    if database == 1:
-        return {'display':'block'}
+    C1B3 = True
+    C2B1 = True
+    C2B2 = True
+    C2B3 = True 
+    C3B2 = True
+
+    if database_selection == 1: # Our Database
+        C1B2 = True
+        C3B1 = False
+        if location_selection == '':
+            C1B3 = True
+        else:
+            C1B3 = False
+         
+    elif database_selection == 2: # Your Files
+        C1B2 = False
+        C3B1 = True
+        if version_selection == '':
+            C1B3 = True
+        else:
+            C1B3 = False
+
     else:
-        return {'display':'none'}
+        C1B2 = True
+        
+        C3B1 = True
     
+    if C1B3 == False and simReportFreq_selection != '':
+        C2B1 = False
+        C2B2 = False
+
+    if C2B2 == False and variable_selection != '':
+        C2B3 = False
+
+    if C2B3 == False and download_selection != '':
+        C3B2 = False
+
+    
+    return C1B2, C1B3, C2B1, C2B2, C2B3, C3B1, C3B2
 # Running the App
  
 if __name__ == '__main__': 
