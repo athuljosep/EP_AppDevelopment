@@ -260,7 +260,7 @@ app.layout = dbc.Container([
                 # Building type selection
                 html.Label("Building Type",
                     className = 'text-left ms-4 mt-1'),
-                dcc.Dropdown(['Commercial','Manufactured','Residential'], 'Commercial',
+                dcc.Dropdown(['Commercial','Manufactured','Residential'], '',
                     id='buildingType_selection',
                     style = {
                         'width': '95%',
@@ -363,6 +363,7 @@ app.layout = dbc.Container([
     Output(component_id = 'download_variables', component_property = 'hidden'),
     Output(component_id = 'building_details', component_property = 'hidden'),
     Output(component_id = 'final_download', component_property = 'hidden'),
+    #Output(component_id = 'final_download', component_property = 'hidden'),
     #Input(component_id = 'Button_1', component_property = 'n_clicks'),
     #Input(component_id = 'Button_2', component_property = 'n_clicks'),
     #Input(component_id = 'Button_3', component_property = 'n_clicks'),
@@ -373,12 +374,14 @@ app.layout = dbc.Container([
     Input(component_id = 'simReportFreq_selection', component_property = 'value'),
     Input(component_id = 'variable_selection', component_property = 'value'),
     Input(component_id = 'download_selection', component_property = 'value'),
+    Input(component_id = 'buildingType_selection', component_property = 'value'),
+
     #State(component_id = 'time-step', component_property = 'value'),
     #State(component_id = 'buildingType-selection', component_property = 'value'),
 
     prevent_initial_call = False)
 
-def CreateOutput(database_selection, version_selection, location_selection, simReportFreq_selection, variable_selection, download_selection):
+def CreateOutput(database_selection, version_selection, location_selection, simReportFreq_selection, variable_selection, download_selection, buildingType_selection):
     
     C1B3 = True
     C2B1 = True
