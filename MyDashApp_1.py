@@ -342,99 +342,6 @@ app.layout = dbc.Container([
                             },),
 
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4,),
-<<<<<<< HEAD
-=======
-
-
-        # Column 3
-        dbc.Col([
-            
-            html.Br(),
-
-            # Box 1 C3
-            html.Div([
-
-                # Building type selection
-                html.Label("Building Type",
-                    className = 'text-left ms-4 mt-1'),
-                dcc.Dropdown(['Commercial','Manufactured','Residential'], '',
-                    id='buildingType_selection',
-                    style = {
-                        'width': '95%',
-                        'margin-left': '2.5%',   
-                        }),
-
-                # IDF type selection
-                html.Label("IDF Type",
-                    className = 'text-left ms-4'),
-                dcc.Dropdown(['ASHRAE','IECC'], 'IECC',
-                    id = 'idfType_selection',
-                    style = {
-                        'width': '95%',
-                        'margin-left': '2.5%',   
-                        }),
-
-                # IDF year selection
-                html.Label("IDF Year",
-                    className = 'text-left ms-4'),
-                dcc.Dropdown(['2012','2013','2015','2016','2018','2019'], '2013',
-                    id='idfYear_selection',
-                    style = {
-                        'width': '95%',
-                        'margin-left': '2.5%',   
-                        }),
-
-                # Building selection
-                html.Label("Building",
-                    className = 'text-left ms-4'),
-                dcc.Dropdown(['ApartmentHighRise','Hospital','HotelLarge','HotelSmall','OfficeLarge','OfficeMedium','OfficeSmall'], 'OfficeSmall',         
-                    id = 'building_selection',
-                    style = {
-                        'width': '95%',
-                        'margin-left': '2.5%',   
-                        }),
-
-                # Location selection
-                html.Label("Location",
-                    className = 'text-left ms-4'),
-                dcc.Dropdown(['Albuquerque','Atlanta','Buffalo','Denver','ElPaso','Fairbanks','GreatFalls','Honululu','InternationalFalls','NewYork','PortAngeles','Rochester','SanDiego','Seattle','Tampa','Tucson'], '',
-                    id = 'location_selection',
-                    style = {
-                        'width': '95%',
-                        'margin-left': '2.5%',
-                        'margin-bottom': '3%',   
-                        },),
-
-                ],id = 'building_details',
-                hidden = True,
-                style = {
-                    'borderWidth': '1px',
-                    'borderStyle': 'solid',
-                    'borderRadius': '5px',
-                    }),
-
-            html.Br(),
-            
-            # Box 2 C3
-            html.Div([
-
-                html.Button('Generate Data',
-                    id = 'Button_2', 
-                    className = "btn btn-secondary btn-lg col-12",
-                    style = {
-                        'width':'90%',
-                        'margin':'5%'
-                        },),
-
-                html.Button('Download Files',
-                    id = 'Button_3', 
-                    className = "btn btn-primary btn-lg col-12",
-                    style = {
-                        'width':'90%',
-                        'margin-left':'5%',
-                        'margin-bottom':'5%'
-                        },),
->>>>>>> 54a66612135bc183a76853d0847e19125f34370d
                 
                 ], justify = "center", align = "center"),  
             
@@ -650,14 +557,10 @@ app.layout = dbc.Container([
     Output(component_id = 'download_variables', component_property = 'hidden'),
     Output(component_id = 'building_details', component_property = 'hidden'),
     Output(component_id = 'final_download', component_property = 'hidden'),
-<<<<<<< HEAD
     Output(component_id = 'upload_aggr_files', component_property = 'hidden'),
     Output(component_id = 'aggr_variable_details', component_property = 'hidden'),
     Output(component_id = 'aggr_details', component_property = 'hidden'),
     Output(component_id = 'aggr_download', component_property = 'hidden'),
-=======
-    #Output(component_id = 'final_download', component_property = 'hidden'),
->>>>>>> 54a66612135bc183a76853d0847e19125f34370d
     #Input(component_id = 'Button_1', component_property = 'n_clicks'),
     #Input(component_id = 'Button_2', component_property = 'n_clicks'),
     #Input(component_id = 'Button_3', component_property = 'n_clicks'),
@@ -668,25 +571,16 @@ app.layout = dbc.Container([
     Input(component_id = 'simReportFreq_selection', component_property = 'value'),
     Input(component_id = 'variable_selection', component_property = 'value'),
     Input(component_id = 'download_selection', component_property = 'value'),
-<<<<<<< HEAD
     Input(component_id = 'input_selection', component_property = 'value'),
     Input(component_id = 'aggr_variable_selection', component_property = 'value'),
     Input(component_id = 'type_selection', component_property = 'value'),
     
-=======
-    Input(component_id = 'buildingType_selection', component_property = 'value'),
-
->>>>>>> 54a66612135bc183a76853d0847e19125f34370d
     #State(component_id = 'time-step', component_property = 'value'),
     #State(component_id = 'buildingType-selection', component_property = 'value'),
 
     prevent_initial_call = False)
 
-<<<<<<< HEAD
 def CreateOutput(database_selection, version_selection, location_selection, simReportFreq_selection, variable_selection, download_selection, input_selection, aggr_variable_selection, type_selection):
-=======
-def CreateOutput(database_selection, version_selection, location_selection, simReportFreq_selection, variable_selection, download_selection, buildingType_selection):
->>>>>>> 54a66612135bc183a76853d0847e19125f34370d
     
     # Tab 1 - EP Generation
     C1B3 = True
