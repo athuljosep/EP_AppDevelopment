@@ -349,7 +349,11 @@ app.layout = dbc.Container([
         
 #################################################################################################
         
-        # Aggregation Tab
+# # # # # #  Aggregation Tab # # # # # # # # #
+
+#################################################################################################
+        
+        
         dcc.Tab(label = 'Aggregation', className = 'text-center text-primary mb-4', children = [
 
             dbc.Row([
