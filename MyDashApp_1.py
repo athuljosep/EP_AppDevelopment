@@ -884,7 +884,7 @@ app.layout = dbc.Container([
         
         dbc.Col([
             
-            html.Button('Plot', id = 'Button_1', 
+            html.Button('Plot', id = 'Button_6', 
                         className = "btn btn-primary btn-lg col-12") ,
             
             ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
@@ -993,7 +993,7 @@ app.layout = dbc.Container([
         
         dbc.Col([
             
-            html.Button('Plot', id = 'Button_2', 
+            html.Button('Plot', id = 'Button_7', 
                         className = "btn btn-primary btn-lg col-12") ,
             
             ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
