@@ -629,60 +629,72 @@ app.layout = dbc.Container([
           
             
             # Row 5, upload files
-            dcc.Upload(
-                id='upload-data1',
-                children=html.Div([
-                    'Drag and Drop or ',
-                    html.A('Select Files for Raw Data')
-                ]),
-                style={
-                    'width': '100%',
-                    'height': '60px',
-                    'lineHeight': '60px',
-                    'borderWidth': '1px',
-                    'borderStyle': 'dashed',
-                    'borderRadius': '5px',
-                    'textAlign': 'center',
-                    'margin': '10px'
-                },
-                # Allow multiple files to be uploaded
-                multiple=True
-            ),
-            #html.Div(id='output-data-upload1'),
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
+                html.Div([
+
+                    # Upload Raw data
+                    dcc.Upload(
+                        id='upload-data1',
+                        children=html.Div([
+                            'Drag and Drop or ',
+                            html.A('Select Files for Raw Data')
+                        ]),
+                        style={
+                            'width': '98.5%',
+                            'height': '60px',
+                            'lineHeight': '60px',
+                            'borderWidth': '1px',
+                            'borderStyle': 'dashed',
+                            'borderRadius': '5px',
+                            'textAlign': 'center',
+                            'margin': '10px'
+                        },
+                        # Allow multiple files to be uploaded
+                        multiple=True
+                    ),
+                    html.Div(id='output-data-upload1'),
                     
-                    html.Br()
+                    # Break Row
+                    dbc.Row([
+                        
+                        dbc.Col([
+                            
+                            html.Br()
+                            
+                            ], width = 12),
+                        
+                        ]),  
                     
-                    ], width = 12),
-                
-                ]),  
+                    # Upload Aggregated data
+                    dcc.Upload(
+                        id='upload-data2',
+                        children=html.Div([
+                            'Drag and Drop or ',
+                            html.A('Select Files for Aggregated Data')
+                        ]),
+                        style={
+                            'width': '98.5%',
+                            'height': '60px',
+                            'lineHeight': '60px',
+                            'borderWidth': '1px',
+                            'borderStyle': 'dashed',
+                            'borderRadius': '5px',
+                            'textAlign': 'center',
+                            'margin': '10px'
+                        },
+                        # Allow multiple files to be uploaded
+                        multiple=True
+                    ),
+                    html.Div(id='output-data-upload2'),
             
-            # Row 6, upload files
-            dcc.Upload(
-                id='upload-data2',
-                children=html.Div([
-                    'Drag and Drop or ',
-                    html.A('Select Files for Aggregated Data')
-                ]),
-                style={
-                    'width': '100%',
-                    'height': '60px',
-                    'lineHeight': '60px',
-                    'borderWidth': '1px',
-                    'borderStyle': 'dashed',
-                    'borderRadius': '5px',
-                    'textAlign': 'center',
-                    'margin': '10px'
-                },
-                # Allow multiple files to be uploaded
-                multiple=True
-            ),
-            html.Div(id='output-data-upload2'),
-            
+                    ],id = 'upload_vis_files',
+                    hidden = False,
+                    style = {
+                        'borderWidth': '1px',
+                        'borderStyle': 'solid',
+                        'borderRadius': '5px',
+                        #'display':'none'
+                        }),
+
             # Break Row
             dbc.Row([
                 
@@ -782,13 +794,60 @@ app.layout = dbc.Container([
                 
                 ]),
             
+
+            dbc.Row([
+                        
+                        dbc.Col([
+                            
+                            html.H4('Mean:')
+                            
+                            ], width = 3),
+                         
+
+                        dbc.Col([
+                            
+                            html.H4('Variance:')
+                            
+                            ], width = 3),
+                         
+
+                        dbc.Col([
+                            
+                            html.H4('Standard Deviation:')
+                            
+                            ], width = 3),
+                         
+
+                        dbc.Col([
+                            
+                            html.H4('Range:')
+                            
+                            ], width = 3),
+                        
+                        ],id = 'vis_details',
+                        #hidden = False,
+                        style = {
+                            'borderWidth': '1px',
+                            'borderStyle': 'solid',
+                            'borderRadius': '5px',
+                            },), 
+            
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Br()
+                    
+                    ], width = 12),
+                
+                ]),
             
             # Row 11
             dbc.Row([
                 
                 dbc.Col([
                     
-                    html.H3("Raw Data Plot:",
+                    html.H3("Distribution Plot:",
                             className = 'text-left text-secondary mb-4')
                     
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
@@ -868,6 +927,16 @@ app.layout = dbc.Container([
                     
                     ], width = 12),
                 
+                ]), 
+            
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Br()
+                    
+                    ], width = 12),
+                
                 ]),       
             
             # Row 15
@@ -879,9 +948,8 @@ app.layout = dbc.Container([
                     
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
                 
-                ], justify = "center", align = "center"), 
-            
-            # Break Row
+                ], justify = "center", align = "center"),
+                
             dbc.Row([
                 
                 dbc.Col([
@@ -890,14 +958,14 @@ app.layout = dbc.Container([
                     
                     ], width = 12),
                 
-                ]),  
+                ]), 
             
-            # Row 16
+            # Row 11
             dbc.Row([
                 
                 dbc.Col([
                     
-                    html.H3("Aggregated Data Plot:",
+                    html.H3("Raw Data Plot:",
                             className = 'text-left text-secondary mb-4')
                     
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
@@ -985,6 +1053,115 @@ app.layout = dbc.Container([
                 dbc.Col([
                     
                     dcc.Graph(id = 'Graph2', figure ={}),
+                    
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+                
+                ], justify = "center", align = "center"), 
+            
+            # Break Row
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Br()
+                    
+                    ], width = 12),
+                
+                ]),  
+            
+            # Row 16
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.H3("Aggregated Data Plot:",
+                            className = 'text-left text-secondary mb-4')
+                    
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
+                
+                ], justify = "left", align = "center"), 
+            
+            # Break Row
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Br()
+                    
+                    ], width = 12),
+                
+                ]),  
+            
+            # Row 12
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.H3("Select Variable:",
+                            className = 'text-left text-secondary mb-4')
+                    
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
+                
+                ], justify = "left", align = "center"), 
+            
+            # Break Row
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Br()
+                    
+                    ], width = 12),
+                
+                ]),  
+        
+            # Row 13
+            dcc.Dropdown(
+                ['Heating', 'Cooling', 'Humidification'],
+                ['Heating', 'Cooling'],
+                multi=True
+                ),
+            
+            # Break Row
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Br()
+                    
+                    ], width = 12),
+                
+                ]),  
+            
+            # Row 14
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Button('Plot', id = 'Button_8', 
+                                className = "btn btn-primary btn-lg col-12") ,
+                    
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+                
+                ], justify = "center", align = "center"),   
+
+            # Break Row
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Br()
+                    
+                    ], width = 12),
+                
+                ]),       
+            
+            # Row 15
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    dcc.Graph(id = 'Graph3', figure ={}),
                     
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
                 
