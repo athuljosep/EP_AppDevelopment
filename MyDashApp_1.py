@@ -626,28 +626,7 @@ app.layout = dbc.Container([
                 
                 ]),  
             
-            # Row 4
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.H3("Folder Path for Uploading Files:",
-                            className = 'text-left text-secondary mb-4')
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12     
-                
-                ], justify = "left", align = "center"),
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),  
+          
             
             # Row 5, upload files
             dcc.Upload(
@@ -669,7 +648,7 @@ app.layout = dbc.Container([
                 # Allow multiple files to be uploaded
                 multiple=True
             ),
-            html.Div(id='output-data-upload1'),
+            #html.Div(id='output-data-upload1'),
             
             # Break Row
             dbc.Row([
