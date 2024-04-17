@@ -9,13 +9,12 @@ operatorlookup = {
     '/': operator.truediv
 }
 
-app = Dash(external_stylesheets=[dbc.themes.PULSE])
+app = Dash(external_stylesheets=[dbc.themes.LUX])
 
 app.layout = html.Div([
     html.H1("Calculator"),
     html.Br(),
     html.Div([
-        
             html.Label("Enter first number "),
             dcc.Input(id='x', value=0, type='number', style={'margin':'5px','marginLeft':'30px'}),
             html.Br(),
@@ -24,7 +23,6 @@ app.layout = html.Div([
             html.Br(),
             html.Label("Enter second number "),
             dcc.Input(id='y', value=0, type='number', style={'margin':'5px','marginLeft':'7px'})
-        
         ]),
     html.Br(),
     html.Label("Answer "),
