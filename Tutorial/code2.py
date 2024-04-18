@@ -15,7 +15,7 @@ app.layout = html.Div(
                 {'label' : "Civil", 'value' : 4},
             ],
             value = "2",
-            #multi = True
+            multi = True
         ),
     ]
 )
