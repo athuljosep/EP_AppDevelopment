@@ -146,6 +146,23 @@ app.layout = dbc.Container([
                                 'margin': '5%',
                                 }),
                         
+                        # Simulation run period
+                        dcc.DatePickerRange(
+                            id='sim-run-period',
+                            min_date_allowed=date(2000, 1, 1),
+                            max_date_allowed=date(2021, 12, 31),
+                            #initial_visible_month=date(2020, 1, 1),
+                            start_date=date(2020, 1, 1),
+                            end_date=date(2020, 12, 31),
+                            display_format='M/D',
+                            style = {
+                                'width': '150%',
+                                'margin': '5%',
+                                },
+                        ),
+                        # html.Div(id='sim-run-period2'),
+
+
                         # Simulation reporting frequency selection
                         dbc.Stack([
                             html.Label("Simulation Reporting Frequency:",
