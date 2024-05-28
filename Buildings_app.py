@@ -5,10 +5,11 @@ Created on Tue Jan 30 15:32:25 2024
 """
 
 # Importing Required Modules
-from dash import Dash, dcc, html, Input, Output, State
+from dash import Dash, dcc, html, Input, Output, State, ctx
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import dash_daq as daq
+import os
 from datetime import date
 
 # Importing User-Defined Modules
@@ -147,6 +148,8 @@ app.layout = dbc.Container([
                                 }),
                         
                         # Simulation run period
+                        html.Label("Simulation Run Period:",
+                                className = 'text', style={'margin-left': '5%'}),
                         dcc.DatePickerRange(
                             id='sim-run-period',
                             min_date_allowed=date(2000, 1, 1),
@@ -156,8 +159,9 @@ app.layout = dbc.Container([
                             end_date=date(2020, 12, 31),
                             display_format='M/D',
                             style = {
-                                'width': '150%',
+                                'width': '100%',
                                 'margin': '5%',
+                                'display': 'block'
                                 },
                         ),
                         # html.Div(id='sim-run-period2'),
@@ -186,12 +190,45 @@ app.layout = dbc.Container([
                             'borderStyle': 'solid',
                             'borderRadius': '5px',
                             },),
+                    
+                    html.Br(),
 
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
                 
 
                 # Column 2
                 dbc.Col([
+
+                    # Box 11 C2
+                    html.Div([
+                        dcc.Input(
+                            id='folder_name',
+                            type='text',
+                            value='',
+                            placeholder='Enter simulation name',
+                            className="center-placeholder center-input",
+                            style={
+                                'width':'90%',
+                                'margin':'5%',
+                                'text-align': 'center'
+                                },),
+
+                        html.Button('Create Folder',
+                            id = 'Button_create_directory', 
+                            className = "btn btn-secondary btn-lg col-12",
+                            style = {
+                                'width':'90%',
+                                'margin-left':'5%',
+                                'margin-bottom':'5%'
+                                },),
+                     
+                        ],id = 'create_directory',
+                        hidden = True,
+                        style = {
+                            'borderWidth': '1px',
+                            'borderStyle': 'solid',
+                            'borderRadius': '5px',
+                            },),
 
                     html.Br(),
 
@@ -264,6 +301,8 @@ app.layout = dbc.Container([
                             'borderStyle': 'solid',
                             'borderRadius': '5px',
                             },),
+
+                    html.Br(),
 
                             ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4,),
 
@@ -367,6 +406,15 @@ app.layout = dbc.Container([
 
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4,),
                 
+                
+
+                html.Button('End Session',
+                    id = 'Button_es_generation', 
+                    className = "btn btn-primary btn-lg col-12",
+                    style = {
+                        'width':'98%',
+                        },),
+
                 ], justify = "center", align = "center"),  
             
         ]),
@@ -518,7 +566,7 @@ app.layout = dbc.Container([
                         # Zone selection
                         html.Label("Type of Aggregation",
                             className = 'text-left ms-4 mt-1'),
-                        dcc.Dropdown(['Type 1','Type 2','Type 3'], '',
+                        dcc.Dropdown(['Average','Weighted Floor Area Average','Weighted Volume Average'], '',
                             id='type_selection',
                             style = {
                                 'width': '95%',
@@ -566,7 +614,15 @@ app.layout = dbc.Container([
                         'borderRadius': '5px',
                         },)
 
-                ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6,)
+                ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6,),
+
+                html.Button('End Session',
+                    id = 'Button_es_aggregation', 
+                    className = "btn btn-primary btn-lg col-12",
+                    style = {
+                        'width':'98%',
+                        'margin-left':'1%'
+                        },),
 
                 ])
             ]), 
@@ -1189,20 +1245,17 @@ app.layout = dbc.Container([
                 
                 dbc.Col([
                     
-                    html.Br()
+                    html.Br(),
+                    html.Button('End Session',
+                    id = 'Button_es_visualization', 
+                    className = "btn btn-primary btn-lg col-12",
+                    ),
                     
                     ], width = 12),
                 
                 ]), 
 
-            dbc.Row([
-
-                # First Column
-                dbc.Col([
-
-                    ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6,)
-
-                ])
+            
             ]) 
         
     ])
@@ -1214,6 +1267,7 @@ app.layout = dbc.Container([
 @app.callback(    
     Output(component_id = 'upload_files', component_property = 'hidden'),
     Output(component_id = 'simulation_details', component_property = 'hidden'),
+    Output(component_id = 'create_directory', component_property = 'hidden'),
     Output(component_id = 'schedules', component_property = 'hidden'),
     Output(component_id = 'generate_variables', component_property = 'hidden'),
     Output(component_id = 'download_variables', component_property = 'hidden'),
@@ -1231,6 +1285,8 @@ app.layout = dbc.Container([
     Input(component_id = 'version_selection', component_property = 'value'),
     Input(component_id = 'location_selection', component_property = 'value'),
     Input(component_id = 'simReportFreq_selection', component_property = 'value'),
+    State(component_id = 'folder_name', component_property = 'value'),
+    Input(component_id = 'Button_create_directory', component_property = 'n_clicks'),
     Input(component_id = 'variable_selection', component_property = 'value'),
     Input(component_id = 'download_selection', component_property = 'value'),
     Input(component_id = 'input_selection', component_property = 'value'),
@@ -1242,10 +1298,11 @@ app.layout = dbc.Container([
 
     prevent_initial_call = False)
 
-def CreateOutput(database_selection, version_selection, location_selection, simReportFreq_selection, variable_selection, download_selection, input_selection, aggr_variable_selection, type_selection):
+def CreateOutput(database_selection, version_selection, location_selection, simReportFreq_selection, folder_name, Button_create_directory, variable_selection, download_selection, input_selection, aggr_variable_selection, type_selection):
     
     # Tab 1 - EP Generation
     C1B3 = True
+    C2B11 = True
     C2B1 = True
     C2B2 = True
     C2B3 = True 
@@ -1273,6 +1330,7 @@ def CreateOutput(database_selection, version_selection, location_selection, simR
         C3B1 = True
     
     if C1B3 == False and simReportFreq_selection != '':
+        C2B11 = False
         C2B1 = False
         C2B2 = False
 
@@ -1302,7 +1360,15 @@ def CreateOutput(database_selection, version_selection, location_selection, simR
     if type_selection != '':
         AC2B2 = False
 
-    return C1B2, C1B3, C2B1, C2B2, C2B3, C3B1, C3B2, AC1B2, AC1B3, AC2B1, AC2B2 
+    trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    if trigger_id == 'Button_create_directory':
+    # if Button_create_directory is not None and Button_create_directory > 0 :
+        simName_FilePath = os.path.join(os.getcwd(), folder_name)
+        IDF_FilePath = "C:/Users/Athul/Documents/GitHub/plotly-works/Files_to_copy/ASHRAE901_OfficeSmall_STD2013_Seattle.idf"
+        Weather_FilePath = "C:/Users/Athul/Documents/GitHub/plotly-works/Files_to_copy/USA_WA_Seattle-Tacoma.Intl.AP.727930_TMY3.epw"
+        AppFuncs.create_simulation_folder(simName_FilePath, IDF_FilePath, Weather_FilePath)
+
+    return C1B2, C1B3, C2B11, C2B1, C2B2, C2B3, C3B1, C3B2, AC1B2, AC1B3, AC2B1, AC2B2 
 # Running the App
  
 if __name__ == '__main__': 
