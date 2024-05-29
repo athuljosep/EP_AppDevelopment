@@ -10,10 +10,14 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 import dash_daq as daq
 import os
+import base64
 from datetime import date
 
 # Importing User-Defined Modules
 import MyDashApp_Module as AppFuncs
+
+UPLOAD_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Uploads")
+WORKSPACE_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Workspace")
 
 # Instantiate our App and incorporate BOOTSTRAP theme Stylesheet
 # Themes - https://dash-bootstrap-components.opensource.faculty.ai/docs/themes/#available-themes
@@ -49,6 +53,38 @@ app.layout = dbc.Container([
                     
                     html.Br(),
 
+                    # Box 11 C1
+                    html.Div([
+                        dcc.Input(
+                            id='folder_name',
+                            type='text',
+                            value='',
+                            placeholder='Enter simulation name',
+                            className="center-placeholder center-input",
+                            style={
+                                'width':'100%',
+                                'margin':'0%',
+                                'text-align': 'center'
+                                },),
+
+                        # html.Button('Create Folder',
+                        #     id = 'Button_create_directory', 
+                        #     className = "btn btn-secondary btn-lg col-12",
+                        #     style = {
+                        #         'width':'90%',
+                        #         'margin-left':'5%',
+                        #         'margin-bottom':'5%'
+                        #         },),
+                     
+                        ],id = 'create_directory',
+                        style = {
+                            # 'borderWidth': '1px',
+                            # 'borderStyle': 'solid',
+                            # 'borderRadius': '5px',
+                            },),
+
+                    html.Br(),
+
                     # Box 1 C1
                     # Database selection
                     dcc.RadioItems(
@@ -75,6 +111,7 @@ app.layout = dbc.Container([
 
                         # Upload IDF file
                         dcc.Upload(['Upload IDF file'],
+                            id = 'upload_idf',
                             className = 'center',
                             style = {
                                 'width': '90%',
@@ -90,6 +127,7 @@ app.layout = dbc.Container([
 
                         # Upload EPW file
                         dcc.Upload(['Upload EPW file'],
+                            id = 'upload_epw',
                             className = 'center',
                             style = {
                                 'width': '90%',
@@ -198,39 +236,6 @@ app.layout = dbc.Container([
 
                 # Column 2
                 dbc.Col([
-
-                    # Box 11 C2
-                    html.Div([
-                        dcc.Input(
-                            id='folder_name',
-                            type='text',
-                            value='',
-                            placeholder='Enter simulation name',
-                            className="center-placeholder center-input",
-                            style={
-                                'width':'90%',
-                                'margin':'5%',
-                                'text-align': 'center'
-                                },),
-
-                        html.Button('Create Folder',
-                            id = 'Button_create_directory', 
-                            className = "btn btn-secondary btn-lg col-12",
-                            style = {
-                                'width':'90%',
-                                'margin-left':'5%',
-                                'margin-bottom':'5%'
-                                },),
-                     
-                        ],id = 'create_directory',
-                        hidden = True,
-                        style = {
-                            'borderWidth': '1px',
-                            'borderStyle': 'solid',
-                            'borderRadius': '5px',
-                            },),
-
-                    html.Br(),
 
                     # Box 1 C2
                     html.Div([
@@ -1267,7 +1272,6 @@ app.layout = dbc.Container([
 @app.callback(    
     Output(component_id = 'upload_files', component_property = 'hidden'),
     Output(component_id = 'simulation_details', component_property = 'hidden'),
-    Output(component_id = 'create_directory', component_property = 'hidden'),
     Output(component_id = 'schedules', component_property = 'hidden'),
     Output(component_id = 'generate_variables', component_property = 'hidden'),
     Output(component_id = 'download_variables', component_property = 'hidden'),
@@ -1282,11 +1286,14 @@ app.layout = dbc.Container([
     #Input(component_id = 'Button_3', component_property = 'n_clicks'),
 
     Input(component_id = 'database_selection', component_property = 'value'),
+    [Input(component_id = 'upload_idf', component_property = 'filename'),
+    Input(component_id = 'upload_idf', component_property = 'contents')],
+    [Input(component_id = 'upload_epw', component_property = 'filename'),
+    Input(component_id = 'upload_epw', component_property = 'contents')],
     Input(component_id = 'version_selection', component_property = 'value'),
     Input(component_id = 'location_selection', component_property = 'value'),
     Input(component_id = 'simReportFreq_selection', component_property = 'value'),
     State(component_id = 'folder_name', component_property = 'value'),
-    Input(component_id = 'Button_create_directory', component_property = 'n_clicks'),
     Input(component_id = 'variable_selection', component_property = 'value'),
     Input(component_id = 'download_selection', component_property = 'value'),
     Input(component_id = 'input_selection', component_property = 'value'),
@@ -1298,11 +1305,10 @@ app.layout = dbc.Container([
 
     prevent_initial_call = False)
 
-def CreateOutput(database_selection, version_selection, location_selection, simReportFreq_selection, folder_name, Button_create_directory, variable_selection, download_selection, input_selection, aggr_variable_selection, type_selection):
+def CreateOutput(database_selection, upload_idf_filename, upload_idf_contents, upload_epw_filename, upload_epw_contents, version_selection, location_selection, simReportFreq_selection, folder_name, variable_selection, download_selection, input_selection, aggr_variable_selection, type_selection):
     
     # Tab 1 - EP Generation
     C1B3 = True
-    C2B11 = True
     C2B1 = True
     C2B2 = True
     C2B3 = True 
@@ -1330,7 +1336,6 @@ def CreateOutput(database_selection, version_selection, location_selection, simR
         C3B1 = True
     
     if C1B3 == False and simReportFreq_selection != '':
-        C2B11 = False
         C2B1 = False
         C2B2 = False
 
@@ -1360,15 +1365,23 @@ def CreateOutput(database_selection, version_selection, location_selection, simR
     if type_selection != '':
         AC2B2 = False
 
-    trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
-    if trigger_id == 'Button_create_directory':
-    # if Button_create_directory is not None and Button_create_directory > 0 :
-        simName_FilePath = os.path.join(os.getcwd(), folder_name)
-        IDF_FilePath = "C:/Users/Athul/Documents/GitHub/plotly-works/Files_to_copy/ASHRAE901_OfficeSmall_STD2013_Seattle.idf"
-        Weather_FilePath = "C:/Users/Athul/Documents/GitHub/plotly-works/Files_to_copy/USA_WA_Seattle-Tacoma.Intl.AP.727930_TMY3.epw"
-        AppFuncs.create_simulation_folder(simName_FilePath, IDF_FilePath, Weather_FilePath)
+    # trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    # if trigger_id == 'Button_create_directory':
+    #     simName_FilePath = os.path.join(os.getcwd(), folder_name)
+    #     IDF_FilePath = "C:/Users/Athul/Documents/GitHub/plotly-works/Files_to_copy/ASHRAE901_OfficeSmall_STD2013_Seattle.idf"
+    #     Weather_FilePath = "C:/Users/Athul/Documents/GitHub/plotly-works/Files_to_copy/USA_WA_Seattle-Tacoma.Intl.AP.727930_TMY3.epw"
+    #     AppFuncs.create_simulation_folder(simName_FilePath, IDF_FilePath, Weather_FilePath)
 
-    return C1B2, C1B3, C2B11, C2B1, C2B2, C2B3, C3B1, C3B2, AC1B2, AC1B3, AC2B1, AC2B2 
+    # Saving files to uploads folder
+    if upload_idf_filename is not None and upload_idf_contents is not None:
+        # for name, data in zip(upload_idf_filename, upload_idf_contents):
+        AppFuncs.save_file(upload_idf_filename, upload_idf_contents, UPLOAD_DIRECTORY)
+
+    # Saving files to uploads folder
+    if upload_epw_filename is not None and upload_epw_contents is not None:
+        AppFuncs.save_file(upload_epw_filename, upload_epw_contents, UPLOAD_DIRECTORY)
+
+    return C1B2, C1B3, C2B1, C2B2, C2B3, C3B1, C3B2, AC1B2, AC1B3, AC2B1, AC2B2 
 # Running the App
  
 if __name__ == '__main__': 
