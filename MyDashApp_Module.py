@@ -81,11 +81,9 @@ def save_file(name, content,UPLOAD_DIRECTORY):
     """Decode and store a file uploaded with Plotly Dash."""
     data = content.encode("utf8").split(b";base64,")[1]
 
+    # Making directory for uploaded files
+    
+
     # Saving file to directory
     with open(os.path.join(UPLOAD_DIRECTORY, name), "wb") as fp:
         fp.write(base64.decodebytes(data))
-
-# function for getting directory
-def list_contents(folder_directory):
-    contents = os.listdir(folder_directory)
-    return contents
