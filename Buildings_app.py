@@ -5,7 +5,7 @@ Created on Tue Jan 30 15:32:25 2024
 """
 
 # Importing Required Modules
-from dash import Dash, dcc, html, Input, Output, State, ctx
+from dash import Dash, dcc, html, Input, Output, State, ctx, callback
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import dash_daq as daq
@@ -90,11 +90,11 @@ app.layout = dbc.Container([
                     dcc.RadioItems(
                         id = 'database_selection',
                         labelStyle = {'display': 'block'},
+                        value = '1',
                         options = [
                             {'label' : " Our Database", 'value' : 1},
                             {'label' : " Your Files", 'value' : 2}
                             ]  ,
-                        value = '',
                         className = 'ps-4 p-3',
                         style = {
                             'width': '100%',
@@ -323,38 +323,41 @@ app.layout = dbc.Container([
                         # Building type selection
                         html.Label("Building Type",
                             className = 'text-left ms-4 mt-1'),
-                        dcc.Dropdown(['Commercial','Manufactured','Residential'], 'Commercial',
+                        dcc.Dropdown(['Commercial_Prototypes','Manufactured_Prototypes','Residential_Prototypes'], '',
                             id='buildingType_selection',
                             style = {
                                 'width': '95%',
                                 'margin-left': '2.5%',   
                                 }),
 
-                        # IDF type selection
-                        html.Label("IDF Type",
+                        # Sub Level 1
+                        html.Label("Sub Level 1",
                             className = 'text-left ms-4'),
-                        dcc.Dropdown(['ASHRAE','IECC'], 'IECC',
-                            id = 'idfType_selection',
+                        dcc.Dropdown(options = [],
+                            value = '',
+                            id = 'level_1',
                             style = {
                                 'width': '95%',
                                 'margin-left': '2.5%',   
                                 }),
 
-                        # IDF year selection
-                        html.Label("IDF Year",
+                        # Sub Level 2
+                        html.Label("Sub Level 2",
                             className = 'text-left ms-4'),
-                        dcc.Dropdown(['2012','2013','2015','2016','2018','2019'], '2013',
-                            id='idfYear_selection',
+                        dcc.Dropdown(options = [],
+                            value = '',
+                            id='level_2',
                             style = {
                                 'width': '95%',
                                 'margin-left': '2.5%',   
                                 }),
 
-                        # Building selection
-                        html.Label("Building",
+                        # Sub Level 3
+                        html.Label("Sub Level 3",
                             className = 'text-left ms-4'),
-                        dcc.Dropdown(['ApartmentHighRise','Hospital','HotelLarge','HotelSmall','OfficeLarge','OfficeMedium','OfficeSmall'], 'OfficeSmall',         
-                            id = 'building_selection',
+                        dcc.Dropdown(options = [],
+                            value = '',         
+                            id = 'level_3',
                             style = {
                                 'width': '95%',
                                 'margin-left': '2.5%',   
@@ -1269,120 +1272,215 @@ app.layout = dbc.Container([
 
 # App Callbacks - Providing Functionality
 
-@app.callback(    
-    Output(component_id = 'upload_files', component_property = 'hidden'),
-    Output(component_id = 'simulation_details', component_property = 'hidden'),
-    Output(component_id = 'schedules', component_property = 'hidden'),
-    Output(component_id = 'generate_variables', component_property = 'hidden'),
-    Output(component_id = 'download_variables', component_property = 'hidden'),
+@app.callback(
     Output(component_id = 'building_details', component_property = 'hidden'),
-    Output(component_id = 'final_download', component_property = 'hidden'),
-    Output(component_id = 'upload_aggr_files', component_property = 'hidden'),
-    Output(component_id = 'aggr_variable_details', component_property = 'hidden'),
-    Output(component_id = 'aggr_details', component_property = 'hidden'),
-    Output(component_id = 'aggr_download', component_property = 'hidden'),
-    #Input(component_id = 'Button_1', component_property = 'n_clicks'),
-    #Input(component_id = 'Button_2', component_property = 'n_clicks'),
-    #Input(component_id = 'Button_3', component_property = 'n_clicks'),
-
+    Output(component_id = 'upload_files', component_property = 'hidden'),
+    Output(component_id = 'simulation_details', component_property = 'hidden', allow_duplicate = True),
+    Output(component_id = 'schedules', component_property = 'hidden', allow_duplicate = True),
+    Output(component_id = 'generate_variables', component_property = 'hidden', allow_duplicate = True),
+    Output(component_id = 'download_variables', component_property = 'hidden', allow_duplicate = True),
+    Output(component_id = 'final_download', component_property = 'hidden', allow_duplicate = True),
     Input(component_id = 'database_selection', component_property = 'value'),
-    [Input(component_id = 'upload_idf', component_property = 'filename'),
-    Input(component_id = 'upload_idf', component_property = 'contents')],
-    [Input(component_id = 'upload_epw', component_property = 'filename'),
-    Input(component_id = 'upload_epw', component_property = 'contents')],
-    Input(component_id = 'version_selection', component_property = 'value'),
-    Input(component_id = 'location_selection', component_property = 'value'),
-    Input(component_id = 'simReportFreq_selection', component_property = 'value'),
-    State(component_id = 'folder_name', component_property = 'value'),
-    Input(component_id = 'variable_selection', component_property = 'value'),
-    Input(component_id = 'download_selection', component_property = 'value'),
-    Input(component_id = 'input_selection', component_property = 'value'),
-    Input(component_id = 'aggr_variable_selection', component_property = 'value'),
-    Input(component_id = 'type_selection', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_Radiobutton_DatabaseSelection_Interaction(database_selection):
     
-    #State(component_id = 'time-step', component_property = 'value'),
-    #State(component_id = 'buildingType-selection', component_property = 'value'),
+    if database_selection == 1:
+        building_details = False
+        upload_files = True
+        simulation_details = True
+        schedules = True
+        generate_variables = True
+        download_variables = True
+        final_download = True
 
-    prevent_initial_call = False)
-
-def CreateOutput(database_selection, upload_idf_filename, upload_idf_contents, upload_epw_filename, upload_epw_contents, version_selection, location_selection, simReportFreq_selection, folder_name, variable_selection, download_selection, input_selection, aggr_variable_selection, type_selection):
-    
-    # Tab 1 - EP Generation
-    C1B3 = True
-    C2B1 = True
-    C2B2 = True
-    C2B3 = True 
-    C3B2 = True
-    
-    if database_selection == 1: # Our Database
-        C1B2 = True
-        C3B1 = False
-        if location_selection == '':
-            C1B3 = True
-        else:
-            C1B3 = False
-         
-    elif database_selection == 2: # Your Files
-        C1B2 = False
-        C3B1 = True
-        if version_selection == '':
-            C1B3 = True
-        else:
-            C1B3 = False
+    elif database_selection == 2:
+        building_details = True
+        upload_files = False
+        simulation_details = True
+        schedules = True
+        generate_variables = True
+        download_variables = True
+        final_download = True
 
     else:
-        C1B2 = True
-        
-        C3B1 = True
+        building_details = True
+        upload_files = True
+        simulation_details = True
+        schedules = True
+        generate_variables = True
+        download_variables = True
+        final_download = True
+
+    return building_details, upload_files, simulation_details , schedules, generate_variables, download_variables, final_download
+
+@app.callback(
+    Output(component_id = 'upload_idf', component_property = 'children'),
+    Input(component_id = 'upload_idf', component_property = 'filename'),
+    State(component_id = 'upload_idf', component_property = 'contents'),
+    prevent_initial_call = False)
+def EPGen_Upload_IDF_Interaction(filename, content):
+    if filename is not None and content is not None:
+        AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY)
+        message = 'File Uploaded'
     
-    if C1B3 == False and simReportFreq_selection != '':
-        C2B1 = False
-        C2B2 = False
+    else:
+        message = 'Upload IDF file'
 
-    if C2B2 == False and variable_selection != '':
-        C2B3 = False
+    return message
 
-    if C2B3 == False and download_selection != '':
-        C3B2 = False
-
-###########################################################
-    # Tab 2 - Aggregation
-
-    AC1B2 = True
-    AC1B3 = True
-    AC2B1 = True
-    AC2B2 = True 
-
-    if input_selection == 1: # Continue session
-        AC1B3 = False
-
-    elif input_selection == 2: # Upload files
-        AC1B2 = False
+@app.callback(
+    Output(component_id = 'upload_epw', component_property = 'children'),
+    Input(component_id = 'upload_epw', component_property = 'filename'),
+    State(component_id = 'upload_epw', component_property = 'contents'),
+    prevent_initial_call = False)
+def EPGen_Upload_EPW_Interaction(filename, content):
+    if filename is not None and content is not None:
+        AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY)
+        message = 'File Uploaded'
     
-    if aggr_variable_selection != '':
-        AC2B1 = False
+    else:
+        message = 'Upload EPW file'
 
-    if type_selection != '':
-        AC2B2 = False
+    return message
 
-    # trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
-    # if trigger_id == 'Button_create_directory':
-    #     simName_FilePath = os.path.join(os.getcwd(), folder_name)
-    #     IDF_FilePath = "C:/Users/Athul/Documents/GitHub/plotly-works/Files_to_copy/ASHRAE901_OfficeSmall_STD2013_Seattle.idf"
-    #     Weather_FilePath = "C:/Users/Athul/Documents/GitHub/plotly-works/Files_to_copy/USA_WA_Seattle-Tacoma.Intl.AP.727930_TMY3.epw"
-    #     AppFuncs.create_simulation_folder(simName_FilePath, IDF_FilePath, Weather_FilePath)
+@app.callback(
+    Output(component_id = 'simulation_details', component_property = 'hidden', allow_duplicate = True),
+    Input(component_id = 'version_selection', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_Dropdown_EPVersion_Interaction(version_selection):
+    if version_selection != '' :
+        simulation_details = False
+    else:
+        simulation_details = True
+    return simulation_details
 
-    # Saving files to uploads folder
-    if upload_idf_filename is not None and upload_idf_contents is not None:
-        # for name, data in zip(upload_idf_filename, upload_idf_contents):
-        AppFuncs.save_file(upload_idf_filename, upload_idf_contents, UPLOAD_DIRECTORY)
+@app.callback(
+    Output(component_id = 'simulation_details', component_property = 'hidden', allow_duplicate = True),
+    Input(component_id = 'location_selection', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_Dropdown_Location_Interaction(location_selection):
+    if location_selection != '' :
+        simulation_details = False
+    else:
+        simulation_details = True
+    return simulation_details
 
-    # Saving files to uploads folder
-    if upload_epw_filename is not None and upload_epw_contents is not None:
-        AppFuncs.save_file(upload_epw_filename, upload_epw_contents, UPLOAD_DIRECTORY)
+@app.callback(
+    Output(component_id = 'schedules', component_property = 'hidden', allow_duplicate = True),
+    Output(component_id = 'generate_variables', component_property = 'hidden', allow_duplicate = True),
+    Input(component_id = 'simReportFreq_selection', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_Dropdown_SimReportFreq_Interaction(simReportFreq_selection):
+    if simReportFreq_selection != '':
+        schedules = False
+        generate_variables = False
+    else:
+        schedules = True
+        generate_variables = True
+    return schedules, generate_variables
 
-    return C1B2, C1B3, C2B1, C2B2, C2B3, C3B1, C3B2, AC1B2, AC1B3, AC2B1, AC2B2 
+@app.callback(
+    Output(component_id = 'download_variables', component_property = 'hidden', allow_duplicate = True),
+    Input(component_id = 'variable_selection', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_Dropdown_GeneratedVariables_Interaction(version_selection):
+    if version_selection != '' :
+        download_variables = False
+    else:
+        download_variables = True
+    return download_variables
+
+@app.callback(
+    Output(component_id = 'final_download', component_property = 'hidden', allow_duplicate = True),
+    Input(component_id = 'download_selection', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_Dropdown_DownloadSelection_Interaction(download_selection):
+    if download_selection != '' :
+        final_download = False
+    else:
+        final_download = True
+    return final_download
+
+
+# Level 1 list
+@app.callback(
+    Output(component_id = 'level_1', component_property = 'options'),
+    Output(component_id = 'level_2', component_property = 'options', allow_duplicate = True),
+    Output(component_id = 'level_3', component_property = 'options', allow_duplicate = True),
+    Output(component_id = 'level_1', component_property = 'value'),
+    Output(component_id = 'level_2', component_property = 'value', allow_duplicate = True),
+    Output(component_id = 'level_3', component_property = 'value', allow_duplicate = True),
+    Input(component_id = 'buildingType_selection', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_Dropdown_BuildingType_Interaction(buildingType_selection):
+    # Listing next sub level of folders
+    if buildingType_selection is not None:
+        FilePath = os.path.join(os.getcwd(), "../../Data/", buildingType_selection)
+        level_1_list = AppFuncs.list_contents(FilePath)
+        level_2_list = []
+        level_3_list = []
+
+    else:
+        level_1_list = []
+        level_2_list = []
+        level_3_list = []
+
+    level_1_value = ''
+    level_2_value = ''
+    level_3_value = ''
+
+    return level_1_list, level_2_list, level_3_list, level_1_value, level_2_value, level_3_value
+
+
+# Level 2 list
+@app.callback(
+    Output(component_id = 'level_2', component_property = 'options', allow_duplicate = True),
+    Output(component_id = 'level_3', component_property = 'options', allow_duplicate = True),
+    Output(component_id = 'level_2', component_property = 'value', allow_duplicate = True),
+    Output(component_id = 'level_3', component_property = 'value', allow_duplicate = True),
+    State(component_id = 'buildingType_selection', component_property = 'value'),
+    Input(component_id = 'level_1', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_Dropdown_SubLevel1_Interaction(buildingType_selection, level_1):
+    # Listing next sub level of folders
+    if level_1 is not None:
+        FilePath = os.path.join(os.getcwd(), "../../Data/", buildingType_selection, level_1)
+        level_2_list = AppFuncs.list_contents(FilePath)
+        level_3_list = []
+
+    else:
+        level_2_list = []
+        level_3_list = []
+
+    level_2_value = ''
+    level_3_value = ''
+
+    return level_2_list, level_3_list, level_2_value, level_3_value
+
+
+# Level 3 list
+@app.callback(
+    Output(component_id = 'level_3', component_property = 'options', allow_duplicate = True),
+    Output(component_id = 'level_3', component_property = 'value', allow_duplicate = True),
+    State(component_id = 'buildingType_selection', component_property = 'value'),
+    State(component_id = 'level_1', component_property = 'value'),
+    Input(component_id = 'level_2', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_Dropdown_SubLevel2_Interaction(buildingType_selection, level_1, level_2):     
+    # Listing next sub level of folders
+    if level_2 is not None:
+        FilePath = os.path.join(os.getcwd(), "../../Data/", buildingType_selection, level_1, level_2)
+        level_3_list = AppFuncs.list_contents(FilePath)
+    
+    else:
+        level_3_list = []
+
+    level_3_value = ''
+
+    return level_3_list, level_3_value
+
+
+
 # Running the App
- 
 if __name__ == '__main__': 
     app.run_server(port=4050)

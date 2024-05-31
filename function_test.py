@@ -1,16 +1,11 @@
 import os
 import MyDashApp_Module as AppFuncs
 
-# os.chdir("C:/Users/athul.p/Documents/GitHub/plotly-works")
-os.chdir("C:/Users/Athul/Documents/GitHub/plotly-works")
+buildingType_selection = "Commercial_Prototypes"
+FolderName = os.path.join("../../Data/", buildingType_selection)
+# FilePath = os.path.join(os.getcwd(), FolderName)
+FilePath = os.path.join(os.getcwd(), "../../Data/", buildingType_selection)
+print(FilePath)
 
-simName = "Simulation2"
-simName_FilePath = os.path.join(os.getcwd(), simName)
-
-# IDF_FilePath = "C:/Users/athul.p/Documents/GitHub/plotly-works/Files_to_copy/ASHRAE901_OfficeSmall_STD2013_Seattle.idf"
-# Weather_FilePath = "C:/Users/athul.p/Documents/GitHub/plotly-works/Files_to_copy/USA_WA_Seattle-Tacoma.Intl.AP.727930_TMY3.epw"
-IDF_FilePath = "C:/Users/Athul/Documents/GitHub/plotly-works/Files_to_copy/ASHRAE901_OfficeSmall_STD2013_Seattle.idf"
-Weather_FilePath = "C:/Users/Athul/Documents/GitHub/plotly-works/Files_to_copy/USA_WA_Seattle-Tacoma.Intl.AP.727930_TMY3.epw"
-print(f"working directory is {simName_FilePath}")
-
-AppFuncs.create_simulation_folder(simName_FilePath, IDF_FilePath, Weather_FilePath)
+a = AppFuncs.list_contents(FilePath)
+print(a)
