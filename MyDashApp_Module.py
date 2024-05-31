@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import os
 import shutil
+import base64
 
 
 # My App Module
@@ -75,4 +76,16 @@ def create_simulation_folder(simName_FilePath, IDF_FilePath, Weather_FilePath):
     
     print(f"Files copied to {temp_folder}")
 
+# function for saving the uploaded file
+def save_file(name, content,UPLOAD_DIRECTORY):
+    """Decode and store a file uploaded with Plotly Dash."""
+    data = content.encode("utf8").split(b";base64,")[1]
 
+    # Saving file to directory
+    with open(os.path.join(UPLOAD_DIRECTORY, name), "wb") as fp:
+        fp.write(base64.decodebytes(data))
+
+# function for getting directory
+def list_contents(folder_directory):
+    contents = os.listdir(folder_directory)
+    return contents
