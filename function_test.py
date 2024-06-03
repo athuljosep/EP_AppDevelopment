@@ -1,3 +1,5 @@
+# This function helps to test individual functionalities
+
 import os
 import MyDashApp_Module as AppFuncs
 
