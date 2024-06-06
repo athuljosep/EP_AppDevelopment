@@ -12,13 +12,17 @@ import dash_daq as daq
 import os
 import base64
 from datetime import date
+import shutil
 
 # Importing User-Defined Modules
 import MyDashApp_Module as AppFuncs
 
 UPLOAD_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Uploads")
 WORKSPACE_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Workspace")
+SIMULATION_FOLDERPATH = 'abc123'
+SIMULATION_FOLDERNAME = 'abc123'
 DATA_DIRECTORY =  os.path.join(os.getcwd(), "..", "..", "Data")
+
 
 # Instantiate our App and incorporate BOOTSTRAP theme Stylesheet
 # Themes - https://dash-bootstrap-components.opensource.faculty.ai/docs/themes/#available-themes
@@ -243,6 +247,7 @@ app.layout = dbc.Container([
                         html.Button('Generate Variables',
                             id = 'EPGen_Button_GenerateVariables', 
                             className = "btn btn-secondary btn-lg col-12",
+                            n_clicks = 0,
                             style = {
                                 'width':'90%',
                                 'margin':'5%'
@@ -1309,10 +1314,12 @@ app.layout = dbc.Container([
     Output(component_id = 'generate_variables', component_property = 'hidden', allow_duplicate = True),
     Output(component_id = 'download_variables', component_property = 'hidden', allow_duplicate = True),
     Output(component_id = 'final_download', component_property = 'hidden', allow_duplicate = True),
+    State(component_id = 'folder_name', component_property = 'value'),
     Input(component_id = 'database_selection', component_property = 'value'),
     prevent_initial_call = True)
-def EPGen_Radiobutton_DatabaseSelection_Interaction(database_selection):
-    
+def EPGen_Radiobutton_DatabaseSelection_Interaction(folder_name, database_selection):
+    global SIMULATION_FOLDERPATH
+    global SIMULATION_FOLDERNAME
     if database_selection == 1:
         building_details = False
         upload_files = True
@@ -1339,6 +1346,18 @@ def EPGen_Radiobutton_DatabaseSelection_Interaction(database_selection):
         generate_variables = True
         download_variables = True
         final_download = True
+
+    if folder_name == None:
+        z = 0
+    else:
+        SIMULATION_FOLDERNAME = folder_name
+
+    SIMULATION_FOLDERPATH = os.path.join(WORKSPACE_DIRECTORY, SIMULATION_FOLDERNAME)
+
+    if os.path.isdir(SIMULATION_FOLDERPATH):
+        z = 0
+    else:
+        os.mkdir(SIMULATION_FOLDERPATH)
 
     return building_details, upload_files, simulation_details , schedules, generate_variables, download_variables, final_download
 
@@ -1522,10 +1541,63 @@ def EPGen_Dropdown_SubLevel2_Interaction(buildingType_selection, level_1, level_
 
 # Generate Variable List Button (Initial Run)
 @app.callback(
-    Output(component_id = 'level_2', component_property = 'options'),
-    Output(component_id = 'level_3', component_property = 'options'),
-    Input(component_id = 'level_1', component_property = 'value'),
+    Output(component_id = 'your_variable_selection', component_property = 'options'),
+    Output(component_id = 'our_variable_selection', component_property = 'options'),
+    State(component_id = 'database_selection', component_property = 'value'),
+    State(component_id = 'buildingType_selection', component_property = 'value'),
+    State(component_id = 'level_1', component_property = 'value'),
+    State(component_id = 'level_2', component_property = 'value'),
+    State(component_id = 'level_3', component_property = 'value'),
+    State(component_id = 'location_selection', component_property = 'value'),
+    Input(component_id = 'EPGen_Button_GenerateVariables', component_property = 'n_clicks'),
     prevent_initial_call = True)
+def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_selection, level_1, level_2, level_3, location_selection, EPGen_Button_GenerateVariables):
+ 
+    if database_selection == 1:
+        your_variable_selection = []
+        our_variable_selection = []
+    
+    elif database_selection == 2:
+        idf_weather_folder_path = os.path.join(SIMULATION_FOLDERPATH, "idf_weather_folder")
+        if os.path.isdir(idf_weather_folder_path):
+            z = 0
+        else:
+            os.mkdir(idf_weather_folder_path)
+
+        for item in os.listdir(UPLOAD_DIRECTORY):
+            shutil.copy(os.path.join(UPLOAD_DIRECTORY,item), idf_weather_folder_path)
+
+    # Appending Special.idf to selected idf file
+    for file in os.listdir(idf_weather_folder_path):
+        if file.endswith(".idf"):
+            file1_path = os.path.join(idf_weather_folder_path, file)
+            file2_path = os.path.join(DATA_DIRECTORY, "Special.idf")
+            with open(file2_path, 'r') as file2:
+                with open(file1_path, 'a') as file1:
+                    shutil.copyfileobj(file2, file1)
+
+    # Copying updated idf and epw to initial run folder
+    initial_run_folder_path = os.path.join(SIMULATION_FOLDERPATH, 'Initial_run_folder')
+    if os.path.isdir(initial_run_folder_path):
+        z = 0
+    else:
+        os.mkdir(initial_run_folder_path)
+
+    for item in os.listdir(idf_weather_folder_path):
+        shutil.copy(os.path.join(idf_weather_folder_path,item), initial_run_folder_path)
+
+
+
+
+
+
+
+
+    print(SIMULATION_FOLDERPATH)
+    print(UPLOAD_DIRECTORY)
+    your_variable_selection = ['a', 'b']
+    our_variable_selection = ['v', 'd']
+    return your_variable_selection, our_variable_selection
 
 # Running the App
 if __name__ == '__main__': 

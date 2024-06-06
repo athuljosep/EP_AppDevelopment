@@ -1,13 +1,10 @@
 # This function helps to test individual functionalities
+import shutil
 
-import os
-import MyDashApp_Module as AppFuncs
 
-buildingType_selection = "Commercial_Prototypes"
-FolderName = os.path.join("../../Data/", buildingType_selection)
-# FilePath = os.path.join(os.getcwd(), FolderName)
-FilePath = os.path.join(os.getcwd(), "../../Data/", buildingType_selection)
-print(FilePath)
+file1_path = 'ASHRAE901_OfficeSmall_STD2013_Seattle.idf'
+file2_path = 'Special.idf'
 
-a = AppFuncs.list_contents(FilePath)
-print(a)
+with open(file2_path, 'r') as file2:
+    with open(file1_path, 'a') as file1:
+        shutil.copyfileobj(file2, file1)
