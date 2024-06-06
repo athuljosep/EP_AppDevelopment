@@ -18,6 +18,7 @@ import MyDashApp_Module as AppFuncs
 
 UPLOAD_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Uploads")
 WORKSPACE_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Workspace")
+DATA_DIRECTORY =  os.path.join(os.getcwd(), "..", "..", "Data")
 
 # Instantiate our App and incorporate BOOTSTRAP theme Stylesheet
 # Themes - https://dash-bootstrap-components.opensource.faculty.ai/docs/themes/#available-themes
@@ -237,6 +238,60 @@ app.layout = dbc.Container([
                 # Column 2
                 dbc.Col([
 
+                    # Box 2 C2
+                    html.Div([
+                        html.Button('Generate Variables',
+                            id = 'EPGen_Button_GenerateVariables', 
+                            className = "btn btn-secondary btn-lg col-12",
+                            style = {
+                                'width':'90%',
+                                'margin':'5%'
+                                },),
+
+                        dcc.Dropdown(options = [],
+                            value = '',
+                            id = 'your_variable_selection',
+                            style = {
+                                'width':'95%',
+                                'margin-left':'2.5%',
+                                'margin-bottom':'5%'
+                                }),
+
+                        dcc.Dropdown(options = [],
+                            value = '',
+                            id = 'our_variable_selection',
+                            style = {
+                                'width':'95%',
+                                'margin-left':'2.5%',
+                                'margin-bottom':'5%'
+                                }),
+
+                        dcc.RadioItems(
+                            id = 'EPGen_Radiobutton_VariableSelection',
+                            labelStyle = {'display': 'block'},
+                            value = '',
+                            options = [
+                                {'label' : " Our Variable Selection", 'value' : 1},
+                                {'label' : " Your Variable Selection", 'value' : 2}
+                                ]  ,
+                            className = 'ps-4 p-3',
+                            style = {
+                                'margin-left':'2.5%',
+                                'margin-bottom':'5%'
+                                }
+                            ),
+                            
+                            ],id = 'generate_variables',
+                            hidden = True,
+                            style = {
+                                'borderWidth': '1px',
+                                'borderStyle': 'solid',
+                                'borderRadius': '5px',
+                            },),
+
+                    html.Br(),
+
+
                     # Box 1 C2
                     html.Div([
                         html.H3("Schedules",
@@ -261,33 +316,7 @@ app.layout = dbc.Container([
                     
                     html.Br(),
 
-                    # Box 2 C2
-                    html.Div([
-                        html.Button('Generate Variables',
-                            id = 'Button_1', 
-                            className = "btn btn-secondary btn-lg col-12",
-                            style = {
-                                'width':'90%',
-                                'margin':'5%'
-                                },),
 
-                        dcc.Dropdown(['var 1','var 2','var 3'], '',
-                            id = 'variable_selection',
-                            style = {
-                                'width':'95%',
-                                'margin-left':'2.5%',
-                                'margin-bottom':'5%'
-                                }),
-                        
-                        ],id = 'generate_variables',
-                        hidden = True,
-                        style = {
-                            'borderWidth': '1px',
-                            'borderStyle': 'solid',
-                            'borderRadius': '5px',
-                            },),
-
-                    html.Br(),
 
                     # Box 3 C2
                     html.Div([
@@ -366,7 +395,7 @@ app.layout = dbc.Container([
                         # Location selection
                         html.Label("Location",
                             className = 'text-left ms-4'),
-                        dcc.Dropdown(['Albuquerque','Atlanta','Buffalo','Denver','ElPaso','Fairbanks','GreatFalls','Honululu','InternationalFalls','NewYork','PortAngeles','Rochester','SanDiego','Seattle','Tampa','Tucson'], '',
+                        dcc.Dropdown(options = [], value = '',
                             id = 'location_selection',
                             style = {
                                 'width': '95%',
@@ -1359,36 +1388,35 @@ def EPGen_Dropdown_EPVersion_Interaction(version_selection):
     Input(component_id = 'location_selection', component_property = 'value'),
     prevent_initial_call = True)
 def EPGen_Dropdown_Location_Interaction(location_selection):
-    if location_selection != '' :
-        simulation_details = False
-    else:
+    if location_selection == '' :
         simulation_details = True
+    else:
+        simulation_details = False
     return simulation_details
 
 @app.callback(
-    Output(component_id = 'schedules', component_property = 'hidden', allow_duplicate = True),
     Output(component_id = 'generate_variables', component_property = 'hidden', allow_duplicate = True),
     Input(component_id = 'simReportFreq_selection', component_property = 'value'),
     prevent_initial_call = True)
 def EPGen_Dropdown_SimReportFreq_Interaction(simReportFreq_selection):
     if simReportFreq_selection != '':
-        schedules = False
         generate_variables = False
     else:
-        schedules = True
         generate_variables = True
-    return schedules, generate_variables
+    return generate_variables
 
 @app.callback(
-    Output(component_id = 'download_variables', component_property = 'hidden', allow_duplicate = True),
-    Input(component_id = 'variable_selection', component_property = 'value'),
+    Output(component_id = 'schedules', component_property = 'hidden', allow_duplicate = True),
+    Input(component_id = 'EPGen_Radiobutton_VariableSelection', component_property = 'value'),
     prevent_initial_call = True)
-def EPGen_Dropdown_GeneratedVariables_Interaction(version_selection):
-    if version_selection != '' :
-        download_variables = False
+def EPGen_Dropdown_SimReportFreq_Interaction(EPGen_Radiobutton_VariableSelection):
+    if EPGen_Radiobutton_VariableSelection == 1:
+        schedules = False
+    elif EPGen_Radiobutton_VariableSelection == 2:
+        schedules = False
     else:
-        download_variables = True
-    return download_variables
+        schedules = True
+    return schedules
 
 @app.callback(
     Output(component_id = 'final_download', component_property = 'hidden', allow_duplicate = True),
@@ -1407,29 +1435,43 @@ def EPGen_Dropdown_DownloadSelection_Interaction(download_selection):
     Output(component_id = 'level_1', component_property = 'options'),
     Output(component_id = 'level_2', component_property = 'options', allow_duplicate = True),
     Output(component_id = 'level_3', component_property = 'options', allow_duplicate = True),
+    Output(component_id = 'location_selection', component_property = 'options'),
     Output(component_id = 'level_1', component_property = 'value'),
     Output(component_id = 'level_2', component_property = 'value', allow_duplicate = True),
     Output(component_id = 'level_3', component_property = 'value', allow_duplicate = True),
+    Output(component_id = 'location_selection', component_property = 'value'),
     Input(component_id = 'buildingType_selection', component_property = 'value'),
     prevent_initial_call = True)
 def EPGen_Dropdown_BuildingType_Interaction(buildingType_selection):
     # Listing next sub level of folders
     if buildingType_selection is not None:
         FilePath = os.path.join(os.getcwd(), "../../Data/", buildingType_selection)
-        level_1_list = AppFuncs.list_contents(FilePath)
+        level_1_list = AppFuncs.list_contents(FilePath)        
         level_2_list = []
         level_3_list = []
+
+        if buildingType_selection == 'Commercial_Prototypes':
+            Weather_FilePath = os.path.join(DATA_DIRECTORY, "TMY3_WeatherFiles_Commercial")
+            Weather_list = AppFuncs.list_contents(Weather_FilePath) 
+        elif buildingType_selection == 'Manufactured_Prototypes':
+            Weather_FilePath = os.path.join(DATA_DIRECTORY, "TMY3_WeatherFiles_Manufactured")
+            Weather_list = AppFuncs.list_contents(Weather_FilePath)
+        elif buildingType_selection == 'Residential_Prototypes':
+            Weather_FilePath = os.path.join(DATA_DIRECTORY, "TMY3_WeatherFiles_Residential")
+            Weather_list = AppFuncs.list_contents(Weather_FilePath)
 
     else:
         level_1_list = []
         level_2_list = []
         level_3_list = []
+        Weather_list = []
 
     level_1_value = ''
     level_2_value = ''
     level_3_value = ''
+    Weather_value = ''
 
-    return level_1_list, level_2_list, level_3_list, level_1_value, level_2_value, level_3_value
+    return level_1_list, level_2_list, level_3_list, Weather_list, level_1_value, level_2_value, level_3_value, Weather_value
 
 
 # Level 2 list
@@ -1457,7 +1499,6 @@ def EPGen_Dropdown_SubLevel1_Interaction(buildingType_selection, level_1):
 
     return level_2_list, level_3_list, level_2_value, level_3_value
 
-
 # Level 3 list
 @app.callback(
     Output(component_id = 'level_3', component_property = 'options', allow_duplicate = True),
@@ -1479,7 +1520,12 @@ def EPGen_Dropdown_SubLevel2_Interaction(buildingType_selection, level_1, level_
 
     return level_3_list, level_3_value
 
-
+# Generate Variable List Button (Initial Run)
+@app.callback(
+    Output(component_id = 'level_2', component_property = 'options'),
+    Output(component_id = 'level_3', component_property = 'options'),
+    Input(component_id = 'level_1', component_property = 'value'),
+    prevent_initial_call = True)
 
 # Running the App
 if __name__ == '__main__': 
