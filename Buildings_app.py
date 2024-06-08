@@ -13,6 +13,7 @@ import os
 import base64
 from datetime import date
 import shutil
+import opyplus as op
 
 # Importing User-Defined Modules
 import MyDashApp_Module as AppFuncs
@@ -22,6 +23,42 @@ WORKSPACE_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Workspace")
 SIMULATION_FOLDERPATH = 'abc123'
 SIMULATION_FOLDERNAME = 'abc123'
 DATA_DIRECTORY =  os.path.join(os.getcwd(), "..", "..", "Data")
+
+OUR_VARIABLE_LIST = ['Schedule_Value_',
+                        'Facility_Total_HVAC_Electric_Demand_Power_',
+                        'Site_Diffuse_Solar_Radiation_Rate_per_Area_',
+                        'Site_Direct_Solar_Radiation_Rate_per_Area_',
+                        'Site_Outdoor_Air_Drybulb_Temperature_',
+                        'Site_Solar_Altitude_Angle_',
+                        'Surface_Inside_Face_Internal_Gains_Radiation_Heat_Gain_Rate_',
+                        'Surface_Inside_Face_Lights_Radiation_Heat_Gain_Rate_',
+                        'Surface_Inside_Face_Solar_Radiation_Heat_Gain_Rate_',
+                        'Surface_Inside_Face_Temperature_',
+                        'Zone_Windows_Total_Transmitted_Solar_Radiation_Rate_',
+                        'Zone_Air_Temperature_',
+                        'Zone_People_Convective_Heating_Rate_',
+                        'Zone_Lights_Convective_Heating_Rate_',
+                        'Zone_Electric_Equipment_Convective_Heating_Rate_',
+                        'Zone_Gas_Equipment_Convective_Heating_Rate_',
+                        'Zone_Other_Equipment_Convective_Heating_Rate_',
+                        'Zone_Hot_Water_Equipment_Convective_Heating_Rate_',
+                        'Zone_Steam_Equipment_Convective_Heating_Rate_',
+                        'Zone_People_Radiant_Heating_Rate_',
+                        'Zone_Lights_Radiant_Heating_Rate_',
+                        'Zone_Electric_Equipment_Radiant_Heating_Rate_',
+                        'Zone_Gas_Equipment_Radiant_Heating_Rate_',
+                        'Zone_Other_Equipment_Radiant_Heating_Rate_',
+                        'Zone_Hot_Water_Equipment_Radiant_Heating_Rate_',
+                        'Zone_Steam_Equipment_Radiant_Heating_Rate_',
+                        'Zone_Lights_Visible_Radiation_Heating_Rate_',
+                        'Zone_Total_Internal_Convective_Heating_Rate_',
+                        'Zone_Total_Internal_Radiant_Heating_Rate_',
+                        'Zone_Total_Internal_Total_Heating_Rate_',
+                        'Zone_Total_Internal_Visible_Radiation_Heating_Rate_',
+                        'Zone_Air_System_Sensible_Cooling_Rate_',
+                        'Zone_Air_System_Sensible_Heating_Rate_',
+                        'System_Node_Temperature_',
+                        'System_Node_Mass_Flow_Rate_']
 
 
 # Instantiate our App and incorporate BOOTSTRAP theme Stylesheet
@@ -71,15 +108,6 @@ app.layout = dbc.Container([
                                 'margin':'0%',
                                 'text-align': 'center'
                                 },),
-
-                        # html.Button('Create Folder',
-                        #     id = 'Button_create_directory', 
-                        #     className = "btn btn-secondary btn-lg col-12",
-                        #     style = {
-                        #         'width':'90%',
-                        #         'margin-left':'5%',
-                        #         'margin-bottom':'5%'
-                        #         },),
                      
                         ],id = 'create_directory',
                         style = {
@@ -168,7 +196,6 @@ app.layout = dbc.Container([
                             'borderWidth': '1px',
                             'borderStyle': 'solid',
                             'borderRadius': '5px',
-                            #'display':'none'
                             }),
 
                     html.Br(),
@@ -222,7 +249,6 @@ app.layout = dbc.Container([
                                     }),
                             ],direction = "horizontal",
                             style = {
-                                #'width': '90%',
                                 'margin': '5%',
                                 }), 
 
@@ -253,15 +279,20 @@ app.layout = dbc.Container([
                                 'margin':'5%'
                                 },),
 
+                        html.Label("Total variables available for selection",
+                            className = 'text-left ms-4'),
                         dcc.Dropdown(options = [],
                             value = '',
                             id = 'your_variable_selection',
+                            multi = True, 
                             style = {
                                 'width':'95%',
                                 'margin-left':'2.5%',
                                 'margin-bottom':'5%'
                                 }),
 
+                        html.Label("Already selected variables",
+                            className = 'text-left ms-4 mt-0'),
                         dcc.Dropdown(options = [],
                             value = '',
                             id = 'our_variable_selection',
@@ -296,7 +327,6 @@ app.layout = dbc.Container([
 
                     html.Br(),
 
-
                     # Box 1 C2
                     html.Div([
                         html.H3("Schedules",
@@ -321,8 +351,6 @@ app.layout = dbc.Container([
                     
                     html.Br(),
 
-
-
                     # Box 3 C2
                     html.Div([
 
@@ -344,7 +372,6 @@ app.layout = dbc.Container([
                     html.Br(),
 
                             ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4,),
-
 
                 # Column 3
                 dbc.Col([
@@ -447,8 +474,6 @@ app.layout = dbc.Container([
                             },),
 
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4,),
-                
-                
 
                 html.Button('End Session',
                     id = 'Button_es_generation', 
@@ -526,7 +551,6 @@ app.layout = dbc.Container([
                                 'textAlign': 'center',
                                 'margin': '5%',
                                 }),
-
 
                         ],id = 'upload_aggr_files',
                         hidden = True,
@@ -624,12 +648,10 @@ app.layout = dbc.Container([
                         'borderRadius': '5px',
                         },),
 
-
                     html.Br(),
 
                     # Box 2 C2
                     html.Div([
-
 
                         html.Button('Aggregate',
                             id = 'Button_4', 
@@ -678,8 +700,6 @@ app.layout = dbc.Container([
         
         dcc.Tab(label = 'Visualization & Analysis', className = 'text-center text-primary mb-4', children = [
 
-                    
-            
             # Row 3
             dbc.Row([
                 
@@ -729,7 +749,6 @@ app.layout = dbc.Container([
                 
                 ], justify = "center", align = "center"),
             
-            
             # Break Row
             dbc.Row([
                 
@@ -740,8 +759,6 @@ app.layout = dbc.Container([
                     ], width = 12),
                 
                 ]),  
-            
-          
             
             # Row 5, upload files
                 html.Div([
@@ -909,43 +926,42 @@ app.layout = dbc.Container([
                 
                 ]),
             
-
             dbc.Row([
                         
-                        dbc.Col([
-                            
-                            html.H4('Mean:')
-                            
-                            ], width = 3),
-                         
+                dbc.Col([
+                    
+                    html.H4('Mean:')
+                    
+                    ], width = 3),
+                    
 
-                        dbc.Col([
-                            
-                            html.H4('Variance:')
-                            
-                            ], width = 3),
-                         
+                dbc.Col([
+                    
+                    html.H4('Variance:')
+                    
+                    ], width = 3),
+                    
 
-                        dbc.Col([
-                            
-                            html.H4('Standard Deviation:')
-                            
-                            ], width = 3),
-                         
+                dbc.Col([
+                    
+                    html.H4('Standard Deviation:')
+                    
+                    ], width = 3),
+                    
 
-                        dbc.Col([
-                            
-                            html.H4('Range:')
-                            
-                            ], width = 3),
-                        
-                        ],id = 'vis_details',
-                        #hidden = False,
-                        style = {
-                            'borderWidth': '1px',
-                            'borderStyle': 'solid',
-                            'borderRadius': '5px',
-                            },), 
+                dbc.Col([
+                    
+                    html.H4('Range:')
+                    
+                    ], width = 3),
+                
+                ],id = 'vis_details',
+                #hidden = False,
+                style = {
+                    'borderWidth': '1px',
+                    'borderStyle': 'solid',
+                    'borderRadius': '5px',
+                    },), 
             
             dbc.Row([
                 
@@ -1531,6 +1547,7 @@ def EPGen_Dropdown_SubLevel2_Interaction(buildingType_selection, level_1, level_
     if level_2 is not None:
         FilePath = os.path.join(os.getcwd(), "../../Data/", buildingType_selection, level_1, level_2)
         level_3_list = AppFuncs.list_contents(FilePath)
+        level_3_list = [file for file in level_3_list if file.endswith('.idf')]
     
     else:
         level_3_list = []
@@ -1553,17 +1570,26 @@ def EPGen_Dropdown_SubLevel2_Interaction(buildingType_selection, level_1, level_
     prevent_initial_call = True)
 def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_selection, level_1, level_2, level_3, location_selection, EPGen_Button_GenerateVariables):
  
+    # Creating idf_weather_folder
+    idf_weather_folder_path = os.path.join(SIMULATION_FOLDERPATH, "idf_weather_folder")
+    if os.path.isdir(idf_weather_folder_path):
+        z = 0
+    else:
+        os.mkdir(idf_weather_folder_path)
+
+    # Copying files to idf_weather_folder
     if database_selection == 1:
-        your_variable_selection = []
-        our_variable_selection = []
+        idf_original_path = os.path.join(DATA_DIRECTORY, buildingType_selection, level_1, level_2, level_3)
+        shutil.copy(idf_original_path, idf_weather_folder_path)
+        if buildingType_selection == 'Commercial_Prototypes':
+            Weather_original_path = os.path.join(DATA_DIRECTORY, "TMY3_WeatherFiles_Commercial", location_selection)
+        elif buildingType_selection == 'Manufactured_Prototypes':
+            Weather_original_path = os.path.join(DATA_DIRECTORY, "TMY3_WeatherFiles_Manufactured", location_selection)
+        elif buildingType_selection == 'Residential_Prototypes':
+            Weather_original_path = os.path.join(DATA_DIRECTORY, "TMY3_WeatherFiles_Residential", location_selection)        
+        shutil.copy(Weather_original_path, idf_weather_folder_path)
     
     elif database_selection == 2:
-        idf_weather_folder_path = os.path.join(SIMULATION_FOLDERPATH, "idf_weather_folder")
-        if os.path.isdir(idf_weather_folder_path):
-            z = 0
-        else:
-            os.mkdir(idf_weather_folder_path)
-
         for item in os.listdir(UPLOAD_DIRECTORY):
             shutil.copy(os.path.join(UPLOAD_DIRECTORY,item), idf_weather_folder_path)
 
@@ -1586,17 +1612,51 @@ def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_
     for item in os.listdir(idf_weather_folder_path):
         shutil.copy(os.path.join(idf_weather_folder_path,item), initial_run_folder_path)
 
+    # Finding directory of .idf and .epw files
+    for file in os.listdir(initial_run_folder_path):
+        if file.endswith(".idf"):
+            Temporary_IDF_FilePath = os.path.join(initial_run_folder_path, file)
 
+    for file in os.listdir(initial_run_folder_path):
+        if file.endswith(".epw"):
+            Temporary_Weather_FilePath = os.path.join(initial_run_folder_path, file)
 
+    # This section is for initial run to get .eio file and variables
+    Initial_IDF_Run = op.simulate(Temporary_IDF_FilePath, Temporary_Weather_FilePath, base_dir_path = initial_run_folder_path)
 
+    # Collecting Simulation Variable List
+    with open(os.path.join(initial_run_folder_path, 'eplusout.rdd')) as f:
+        lines = f.readlines()
+        
+    Simulation_VariableNames = []  
 
+    Counter_Lines = 0
 
+    for line in lines:
+        if (Counter_Lines > 1):
+            split_line = line.split(',')
+            Simulation_VariableNames.append(split_line[2].split('[')[0])
 
+        Counter_Lines = Counter_Lines + 1
+        # Simulation_VariableNames.append(split_line[2])
+        # split_line_unit = split_line[3].split('[')[1]
+        # split_line_unit = split_line_unit[0].split(']')[0]
+        # Simulation_VariableNames.append(split_line_unit)
 
-    print(SIMULATION_FOLDERPATH)
-    print(UPLOAD_DIRECTORY)
-    your_variable_selection = ['a', 'b']
-    our_variable_selection = ['v', 'd']
+    Simulation_VariableNames.sort()
+
+    modified_OUR_VARIABLE_LIST = []
+    for item in OUR_VARIABLE_LIST:
+        # Remove the last underscore
+        item = item.rstrip('_')
+        # Replace remaining underscores with spaces
+        item = item.replace('_', ' ')
+        modified_OUR_VARIABLE_LIST.append(item)
+
+    modified_OUR_VARIABLE_LIST.sort()
+
+    your_variable_selection = Simulation_VariableNames
+    our_variable_selection = modified_OUR_VARIABLE_LIST
     return your_variable_selection, our_variable_selection
 
 # Running the App
