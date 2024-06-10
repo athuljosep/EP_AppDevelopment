@@ -1602,13 +1602,14 @@ def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_
                 with open(file1_path, 'a') as file1:
                     shutil.copyfileobj(file2, file1)
 
-    # Copying updated idf and epw to initial run folder
+    # Creating inirial_run_folder
     initial_run_folder_path = os.path.join(SIMULATION_FOLDERPATH, 'Initial_run_folder')
     if os.path.isdir(initial_run_folder_path):
         z = 0
     else:
         os.mkdir(initial_run_folder_path)
 
+    # Copying updated idf and epw to initial run folder
     for item in os.listdir(idf_weather_folder_path):
         shutil.copy(os.path.join(idf_weather_folder_path,item), initial_run_folder_path)
 
