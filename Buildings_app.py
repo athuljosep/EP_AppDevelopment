@@ -14,6 +14,7 @@ import base64
 from datetime import date
 import shutil
 import opyplus as op
+import re
 
 # Importing User-Defined Modules
 import MyDashApp_Module as AppFuncs
@@ -105,8 +106,10 @@ app.layout = dbc.Container([
                             className="center-placeholder center-input",
                             style={
                                 'width':'100%',
+                                'height':'50px',
                                 'margin':'0%',
-                                'text-align': 'center'
+                                'text-align': 'center',
+                                'font-size': '24px'
                                 },),
                      
                         ],id = 'create_directory',
@@ -332,15 +335,36 @@ app.layout = dbc.Container([
                         html.H3("Schedules",
                             className = 'text-center mt-1'),
                         html.H6("People",
-                            className = 'ms-2'),
+                            className = 'ms-4'),
+                        dcc.Dropdown(options = [],
+                            value = '',
+                            id = 'people_schedules', 
+                            style = {
+                                'width':'95%',
+                                'margin-left':'2.5%',
+                                'margin-bottom':'5%'
+                                }),
                         html.H6("Equipment",
-                            className = 'ms-2'),
+                            className = 'ms-4'),
+                        dcc.Dropdown(options = [],
+                            value = '',
+                            id = 'equip_schedules', 
+                            style = {
+                                'width':'95%',
+                                'margin-left':'2.5%',
+                                'margin-bottom':'5%'
+                                }),
                         html.H6("Light",
-                            className = 'ms-2'),
-                        html.H6("Exterior Light",
-                            className = 'ms-2'),
-                        html.H6("Heat/Cool Setpoint",
-                            className = 'ms-2'),
+                            className = 'ms-4'),
+                        dcc.Dropdown(options = [],
+                            value = '',
+                            id = 'light_schedules', 
+                            style = {
+                                'width':'95%',
+                                'margin-left':'2.5%',
+                                'margin-bottom':'5%'
+                                }),
+                        
                         ],id = 'schedules',
                         hidden = True,
                         style = {
@@ -1440,18 +1464,58 @@ def EPGen_Dropdown_SimReportFreq_Interaction(simReportFreq_selection):
         generate_variables = True
     return generate_variables
 
+# Variable selection radio button interaction
 @app.callback(
     Output(component_id = 'schedules', component_property = 'hidden', allow_duplicate = True),
+    Output(component_id = 'people_schedules', component_property = 'options'),
+    Output(component_id = 'equip_schedules', component_property = 'options'),
+    Output(component_id = 'light_schedules', component_property = 'options'),
     Input(component_id = 'EPGen_Radiobutton_VariableSelection', component_property = 'value'),
     prevent_initial_call = True)
-def EPGen_Dropdown_SimReportFreq_Interaction(EPGen_Radiobutton_VariableSelection):
+def EPGen_Dropdown_VariableSelection_Interaction(EPGen_Radiobutton_VariableSelection):
     if EPGen_Radiobutton_VariableSelection == 1:
         schedules = False
     elif EPGen_Radiobutton_VariableSelection == 2:
         schedules = False
     else:
         schedules = True
-    return schedules
+
+    initial_run_folder_path = os.path.join(SIMULATION_FOLDERPATH, 'Initial_run_folder')
+    eio_FilePath = os.path.join(initial_run_folder_path, "eplusout.eio")
+    Eio_OutputFile_Dict = AppFuncs.EPGen_eio_dict_generator(eio_FilePath)
+
+    People_Schedules = Eio_OutputFile_Dict['People Internal Gains Nominal']['Schedule Name'].tolist()
+    People_Schedules = list(set(People_Schedules))
+
+    Equip_Schedules = Eio_OutputFile_Dict['ElectricEquipment Internal Gains Nominal']['Schedule Name'].tolist()
+    Equip_Schedules = list(set(Equip_Schedules))
+
+    Light_Schedules = Eio_OutputFile_Dict['Lights Internal Gains Nominal']['Schedule Name'].tolist()
+    Light_Schedules = list(set(Light_Schedules))
+
+    # Finding directory of .idf and .epw files
+    for file in os.listdir(initial_run_folder_path):
+        if file.endswith(".idf"):
+            IDF_FilePath = os.path.join(initial_run_folder_path, file)
+    
+    # Load IDF File
+    Current_IDFFile = op.Epm.load(IDF_FilePath)
+
+    # Getting ThermalSetpoint items
+    filtered_items = [item for item in dir(Current_IDFFile) if "ThermostatSetpoint" in item]
+    ThermostatSetpoint_List = []
+    for attr in filtered_items:
+        if not attr.startswith('__'):
+            value = getattr(Current_IDFFile, attr)
+            ThermostatSetpoint_List.append(value)
+
+    for item in filtered_items
+        if not item:
+            continue
+        else:
+            Current_IDFFile.ThermostatSetpoint_DualSetpoint._records['core_zn dualspsched'].heating_setpoint_temperature_schedule_name.name
+
+    return schedules, People_Schedules, Equip_Schedules, Light_Schedules
 
 @app.callback(
     Output(component_id = 'final_download', component_property = 'hidden', allow_duplicate = True),
@@ -1659,6 +1723,9 @@ def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_
     your_variable_selection = Simulation_VariableNames
     our_variable_selection = modified_OUR_VARIABLE_LIST
     return your_variable_selection, our_variable_selection
+
+
+
 
 # Running the App
 if __name__ == '__main__': 
