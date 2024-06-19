@@ -319,6 +319,21 @@ app.layout = dbc.Container([
                                 'margin-bottom':'5%'
                                 }
                             ),
+
+                        dcc.RadioItems(
+                            id = 'EPGen_Radiobutton_EditSchedules',
+                            labelStyle = {'display': 'block'},
+                            value = '',
+                            options = [
+                                {'label' : " Edit Schedules", 'value' : 1},
+                                {'label' : " Keep Original Schedules", 'value' : 2}
+                                ]  ,
+                            className = 'ps-4 p-3',
+                            style = {
+                                'margin-left':'2.5%',
+                                'margin-bottom':'5%'
+                                }
+                            ),
                             
                             ],id = 'generate_variables',
                             hidden = True,
@@ -332,7 +347,7 @@ app.layout = dbc.Container([
 
                     # Box 1 C2
                     html.Div([
-                        html.H3("Schedules",
+                        html.H3("Edit Schedules",
                             className = 'text-center mt-1'),
                         html.H6("People",
                             className = 'ms-4'),
@@ -344,6 +359,7 @@ app.layout = dbc.Container([
                                 'margin-left':'2.5%',
                                 'margin-bottom':'5%'
                                 }),
+
                         html.H6("Equipment",
                             className = 'ms-4'),
                         dcc.Dropdown(options = [],
@@ -354,6 +370,7 @@ app.layout = dbc.Container([
                                 'margin-left':'2.5%',
                                 'margin-bottom':'5%'
                                 }),
+
                         html.H6("Light",
                             className = 'ms-4'),
                         dcc.Dropdown(options = [],
@@ -364,7 +381,66 @@ app.layout = dbc.Container([
                                 'margin-left':'2.5%',
                                 'margin-bottom':'5%'
                                 }),
+
+                        html.H6("Heating",
+                            className = 'ms-4'),
+                        dcc.Dropdown(options = [],
+                            value = '',
+                            id = 'heating_schedules', 
+                            style = {
+                                'width':'95%',
+                                'margin-left':'2.5%',
+                                'margin-bottom':'5%'
+                                }),
                         
+                        html.H6("Cooling",
+                            className = 'ms-4'),
+                        dcc.Dropdown(options = [],
+                            value = '',
+                            id = 'cooling_schedules', 
+                            style = {
+                                'width':'95%',
+                                'margin-left':'2.5%',
+                                'margin-bottom':'5%'
+                                }),
+
+                        html.H6("Temperature",
+                            className = 'ms-4'),
+                        dcc.Dropdown(options = [],
+                            value = '',
+                            id = 'temperature_schedules', 
+                            style = {
+                                'width':'95%',
+                                'margin-left':'2.5%',
+                                'margin-bottom':'5%'
+                                }),
+                        
+                        html.H6("Paste your custom schedule",
+                            className = 'ms-4'),
+                        dcc.Textarea(
+                            id='schedule_input',
+                            value='',
+                            style={'width': '90%',
+                                   'margin-left':'5%',
+                                   'height': 100},
+                        ),
+
+                        html.Button('Select single schedule',
+                            id = 'update_selected_schedule', 
+                            className = "btn btn-secondary btn-lg col-12",
+                            style = {
+                                'width':'90%',
+                                'margin':'5%'
+                                },),
+                        
+                        html.Button('Done Updating Schedule',
+                            id = 'done_updating_schedule', 
+                            className = "btn btn-secondary btn-lg col-12",
+                            style = {
+                                'width':'90%',
+                                'margin':'5%'
+                                },),
+
                         ],id = 'schedules',
                         hidden = True,
                         style = {
@@ -1470,52 +1546,110 @@ def EPGen_Dropdown_SimReportFreq_Interaction(simReportFreq_selection):
     Output(component_id = 'people_schedules', component_property = 'options'),
     Output(component_id = 'equip_schedules', component_property = 'options'),
     Output(component_id = 'light_schedules', component_property = 'options'),
-    Input(component_id = 'EPGen_Radiobutton_VariableSelection', component_property = 'value'),
+    Output(component_id = 'heating_schedules', component_property = 'options'),
+    Output(component_id = 'cooling_schedules', component_property = 'options'),
+    Output(component_id = 'temperature_schedules', component_property = 'options'),
+    Input(component_id = 'EPGen_Radiobutton_EditSchedules', component_property = 'value'),
     prevent_initial_call = True)
 def EPGen_Dropdown_VariableSelection_Interaction(EPGen_Radiobutton_VariableSelection):
+    initial_run_folder_path = os.path.join(SIMULATION_FOLDERPATH, 'Initial_run_folder')
+    idf_weather_folder_path = os.path.join(SIMULATION_FOLDERPATH, "idf_weather_folder")
     if EPGen_Radiobutton_VariableSelection == 1:
         schedules = False
+        eio_FilePath = os.path.join(initial_run_folder_path, "eplusout.eio")
+        Eio_OutputFile_Dict = AppFuncs.EPGen_eio_dict_generator(eio_FilePath)
+
+        People_Schedules = Eio_OutputFile_Dict['People Internal Gains Nominal']['Schedule Name'].tolist()
+        People_Schedules = list(set(People_Schedules))
+
+        Equip_Schedules = Eio_OutputFile_Dict['ElectricEquipment Internal Gains Nominal']['Schedule Name'].tolist()
+        Equip_Schedules = list(set(Equip_Schedules))
+
+        Light_Schedules = Eio_OutputFile_Dict['Lights Internal Gains Nominal']['Schedule Name'].tolist()
+        Light_Schedules = list(set(Light_Schedules))
+
+        # Finding directory of .idf and .epw files
+        for file in os.listdir(initial_run_folder_path):
+            if file.endswith(".idf"):
+                IDF_FilePath = os.path.join(initial_run_folder_path, file)
+        
+        # Load IDF File
+        Current_IDFFile = op.Epm.load(IDF_FilePath)
+
+        # Getting ThermalSetpoint items
+        filtered_items = [item for item in dir(Current_IDFFile) if "ThermostatSetpoint" in item]
+        ThermostatSetpoint_List = []
+        for attr in filtered_items:
+            if not attr.startswith('__'):
+                value = getattr(Current_IDFFile, attr)
+                ThermostatSetpoint_List.append(value)
+
+        counter  = -1
+        ThermostatSetpoint_attribute_nameList = ['heating_setpoint_temperature_schedule_name', 'cooling_setpoint_temperature_schedule_name', 'setpoint_temperature_schedule_name']
+        HeatingSetpoint_List = []
+        CoolingSetpoint_List = []
+        TemperatureSetpoint_List = []
+
+        for item in filtered_items:
+            counter = counter + 1
+            if not item:
+                continue
+            else:
+                Current_ThermostatSetpoint_dict = ThermostatSetpoint_List[counter]._records
+
+                for Current_key in Current_ThermostatSetpoint_dict:
+                    Current_ThermostatSetpoint_element = Current_ThermostatSetpoint_dict[Current_key] 
+
+                    for attr in ThermostatSetpoint_attribute_nameList:
+                        try:
+                            Current_ThermostatSetpoint_element_value = getattr(Current_ThermostatSetpoint_element, attr)
+
+                        except:
+                            continue
+
+                        else:
+                            if attr == 'heating_setpoint_temperature_schedule_name':
+                                HeatingSetpoint_List.append(Current_ThermostatSetpoint_element_value.name)
+
+                            if attr == 'cooling_setpoint_temperature_schedule_name':
+                                CoolingSetpoint_List.append(Current_ThermostatSetpoint_element_value.name)
+
+                            if attr == 'setpoint_temperature_schedule_name':
+                                TemperatureSetpoint_List.append(Current_ThermostatSetpoint_element_value.name)
+                
+        HeatingSetpoint_Schedules = list(set(HeatingSetpoint_List))
+        CoolingSetpoint_Schedules = list(set(CoolingSetpoint_List))
+        TemperatureSetpoint_Schedules = list(set(TemperatureSetpoint_List))
     elif EPGen_Radiobutton_VariableSelection == 2:
-        schedules = False
+        schedules = True
+        People_Schedules = []
+        Equip_Schedules = []
+        Light_Schedules = []
+        HeatingSetpoint_Schedules = []
+        CoolingSetpoint_Schedules = []
+        TemperatureSetpoint_Schedules = []
     else:
         schedules = True
-
-    initial_run_folder_path = os.path.join(SIMULATION_FOLDERPATH, 'Initial_run_folder')
-    eio_FilePath = os.path.join(initial_run_folder_path, "eplusout.eio")
-    Eio_OutputFile_Dict = AppFuncs.EPGen_eio_dict_generator(eio_FilePath)
-
-    People_Schedules = Eio_OutputFile_Dict['People Internal Gains Nominal']['Schedule Name'].tolist()
-    People_Schedules = list(set(People_Schedules))
-
-    Equip_Schedules = Eio_OutputFile_Dict['ElectricEquipment Internal Gains Nominal']['Schedule Name'].tolist()
-    Equip_Schedules = list(set(Equip_Schedules))
-
-    Light_Schedules = Eio_OutputFile_Dict['Lights Internal Gains Nominal']['Schedule Name'].tolist()
-    Light_Schedules = list(set(Light_Schedules))
-
-    # Finding directory of .idf and .epw files
-    for file in os.listdir(initial_run_folder_path):
-        if file.endswith(".idf"):
-            IDF_FilePath = os.path.join(initial_run_folder_path, file)
+        People_Schedules = []
+        Equip_Schedules = []
+        Light_Schedules = []
+        HeatingSetpoint_Schedules = []
+        CoolingSetpoint_Schedules = []
+        TemperatureSetpoint_Schedules = []
     
-    # Load IDF File
-    Current_IDFFile = op.Epm.load(IDF_FilePath)
+    edited_idf_folder_path = os.path.join(SIMULATION_FOLDERPATH,'Edited_idf_folder')
 
-    # Getting ThermalSetpoint items
-    filtered_items = [item for item in dir(Current_IDFFile) if "ThermostatSetpoint" in item]
-    ThermostatSetpoint_List = []
-    for attr in filtered_items:
-        if not attr.startswith('__'):
-            value = getattr(Current_IDFFile, attr)
-            ThermostatSetpoint_List.append(value)
+    if os.path.isdir(edited_idf_folder_path):
+        z = 0
+    else:
+        os.mkdir(edited_idf_folder_path)
+        for item in os.listdir(initial_run_folder_path):
+            if (item.endswith(".idf") or item.endswith(".epw")) and (not item.startswith("opyplus")):
+                shutil.copy(os.path.join(initial_run_folder_path,item), edited_idf_folder_path)
+                     
+    #Current_IDFFile.ThermostatSetpoint_DualSetpoint._records['core_zn dualspsched'].heating_setpoint_temperature_schedule_name.name
 
-    for item in filtered_items
-        if not item:
-            continue
-        else:
-            Current_IDFFile.ThermostatSetpoint_DualSetpoint._records['core_zn dualspsched'].heating_setpoint_temperature_schedule_name.name
-
-    return schedules, People_Schedules, Equip_Schedules, Light_Schedules
+    return schedules, People_Schedules, Equip_Schedules, Light_Schedules, HeatingSetpoint_Schedules, CoolingSetpoint_Schedules, TemperatureSetpoint_Schedules
 
 @app.callback(
     Output(component_id = 'final_download', component_property = 'hidden', allow_duplicate = True),
@@ -1724,6 +1858,64 @@ def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_
     our_variable_selection = modified_OUR_VARIABLE_LIST
     return your_variable_selection, our_variable_selection
 
+@app.callback(
+    Output(component_id = 'update_selected_schedule', component_property = 'children', allow_duplicate = True),
+    Input(component_id = 'people_schedules', component_property = 'value'),
+    Input(component_id = 'equip_schedules', component_property = 'value'),
+    Input(component_id = 'light_schedules', component_property = 'value'),
+    Input(component_id = 'heating_schedules', component_property = 'value'),
+    Input(component_id = 'cooling_schedules', component_property = 'value'),
+    Input(component_id = 'temperature_schedules', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_Dropdown_EditSchedule_Interaction(people_schedules, equip_schedules, light_schedules, heating_schedules, cooling_schedules, temperature_schedules):
+    if (not (people_schedules == None)) or (not (equip_schedules == None)) or (not (light_schedules == None)) or (not (heating_schedules == None)) or (not (cooling_schedules == None)) or (not (temperature_schedules == None)):
+        update_selected_schedule = "Update selected schedule"
+    else:
+        update_selected_schedule = "Select single schedule"
+    return update_selected_schedule
+
+@app.callback(
+    Output(component_id = 'update_selected_schedule', component_property = 'children', allow_duplicate = True),
+    State(component_id = 'people_schedules', component_property = 'value'),
+    State(component_id = 'equip_schedules', component_property = 'value'),
+    State(component_id = 'light_schedules', component_property = 'value'),
+    State(component_id = 'heating_schedules', component_property = 'value'),
+    State(component_id = 'cooling_schedules', component_property = 'value'),
+    State(component_id = 'temperature_schedules', component_property = 'value'),
+    State(component_id = 'schedule_input', component_property = 'value'),
+    Input(component_id = 'update_selected_schedule', component_property = 'n_clicks'),
+    prevent_initial_call = True)
+def EPGen_Button_UpdateSelectedSchedule_Interaction(people_schedules, equip_schedules, light_schedules, heating_schedules, cooling_schedules, temperature_schedules, schedule_input, n_clicks):
+    schedule_list = [people_schedules, equip_schedules, light_schedules, heating_schedules, cooling_schedules, temperature_schedules]
+    
+    edited_idf_folder_path = os.path.join(SIMULATION_FOLDERPATH,'Edited_idf_folder')
+    
+    count_none = 0
+   
+    for schedule in schedule_list:
+        if schedule == None:
+            count_none = count_none + 1
+        else:
+            desired_schedule = schedule
+    
+    if count_none <= 5:
+        update_selected_schedule = "Please select one"
+    else:
+        for item in os.listdir(edited_idf_folder_path):
+            if item.endswith(".idf"):
+                IDF_FilePath = os.path.join(edited_idf_folder_path, item)
+
+        Edited_IDFFile = op.Epm.load(IDF_FilePath)
+
+
+
+
+
+
+
+
+
+    return update_selected_schedule
 
 
 
