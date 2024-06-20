@@ -1886,6 +1886,7 @@ def EPGen_Dropdown_EditSchedule_Interaction(people_schedules, equip_schedules, l
     Input(component_id = 'update_selected_schedule', component_property = 'n_clicks'),
     prevent_initial_call = True)
 def EPGen_Button_UpdateSelectedSchedule_Interaction(people_schedules, equip_schedules, light_schedules, heating_schedules, cooling_schedules, temperature_schedules, schedule_input, n_clicks):
+    
     schedule_list = [people_schedules, equip_schedules, light_schedules, heating_schedules, cooling_schedules, temperature_schedules]
     
     edited_idf_folder_path = os.path.join(SIMULATION_FOLDERPATH,'Edited_idf_folder')
@@ -1898,7 +1899,7 @@ def EPGen_Button_UpdateSelectedSchedule_Interaction(people_schedules, equip_sche
         else:
             desired_schedule = schedule
     
-    if count_none <= 5:
+    if count_none != 5:
         update_selected_schedule = "Please select one"
     else:
         for item in os.listdir(edited_idf_folder_path):
@@ -1907,17 +1908,64 @@ def EPGen_Button_UpdateSelectedSchedule_Interaction(people_schedules, equip_sche
 
         Edited_IDFFile = op.Epm.load(IDF_FilePath)
 
+        # Step 1 Get compact schedule from edited idf
+        Edited_ScheduleCompact = Edited_IDFFile.Schedule_Compact
 
+        # Step 2 Get table from compact schedule which corresponds to desired schedule
+        Current_Schedule_1 = Edited_ScheduleCompact.one(lambda x: x.name == desired_schedule.lower())
+       
+        # Step 3 change the name to something xyz@123 add user defined schedule
+        Current_Schedule_1.name = 'xyz'
 
+        lines  = schedule_input.split('\n')
 
+        Rough_schedule_lines_list = [line.strip() for line in lines]
 
+        new_schedule_rough = {}
 
+        for line1 in Rough_schedule_lines_list:
+            Current_line_elements = line1.split('!-')
+            Current_value = Current_line_elements[0].strip()
+            Current_key = Current_line_elements[1].lower().strip().replace(' ', '_')
+            
+            if Current_value[-1] == ',':
+                Current_value = Current_value[:-1]
 
+            new_schedule_rough[Current_key] = Current_value
 
+        new_sch = Edited_ScheduleCompact.add(new_schedule_rough)
+
+        # Step 4 Use opyplus to overwrite edited file
+        Edited_IDFFile.save(IDF_FilePath)
+
+        # Step 5 Read the file and change particular name to desired name
+        with open(IDF_FilePath, 'r') as file:
+            lines = file.readlines()
+
+        for ii in range(len(lines)):
+
+            if ii == 0:
+                continue
+            else:
+                line_k = lines[ii-1]
+                line_k_plus_1 = lines[ii]
+
+                if not (line_k.find('Schedule:Compact') >= 0):
+
+                    if line_k_plus_1.find('xyz') >= 0:
+                        
+                        lines[ii] = line_k_plus_1.replace('xyz', desired_schedule.lower())        
+
+        # Step 6 OverWrite the file again
+        with open(IDF_FilePath, 'w') as file:
+            # Write each item in the list to the file
+            for line in lines:
+                file.write(line)
+
+        # Step 7 update update_selected_schedule 
+        update_selected_schedule = "Schedule updated"
 
     return update_selected_schedule
-
-
 
 # Running the App
 if __name__ == '__main__': 
