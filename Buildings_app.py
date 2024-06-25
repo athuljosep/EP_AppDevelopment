@@ -15,6 +15,10 @@ from datetime import date
 import shutil
 import opyplus as op
 import re
+import numpy as np
+import pandas as pd
+import datetime
+import pickle
 
 # Importing User-Defined Modules
 import MyDashApp_Module as AppFuncs
@@ -210,7 +214,7 @@ app.layout = dbc.Container([
                         dbc.Stack([
                             html.Label("Time Step:",
                                 className = 'text'), 
-                            daq.NumericInput(id = 'time-step', 
+                            daq.NumericInput(id = 'sim_TimeStep', 
                                 value = 5,
                                 style = {
                                     'margin-left':'28%'
@@ -224,7 +228,7 @@ app.layout = dbc.Container([
                         html.Label("Simulation Run Period:",
                                 className = 'text', style={'margin-left': '5%'}),
                         dcc.DatePickerRange(
-                            id='sim-run-period',
+                            id='sim_run_period',
                             min_date_allowed=date(2000, 1, 1),
                             max_date_allowed=date(2021, 12, 31),
                             #initial_visible_month=date(2020, 1, 1),
@@ -454,7 +458,11 @@ app.layout = dbc.Container([
                     # Box 3 C2
                     html.Div([
 
-                        dcc.Checklist([' Simulation Variables',' EIO',' IDF Object Records'],'',
+                        dcc.Checklist([
+                            {'label' : " Simulation Variables", 'value' : 1},
+                            {'label' : " EIO", 'value' : 2}
+                            ],
+                            '',
                             id = 'download_selection',
                             style = {
                                 'width':'95%',
@@ -549,7 +557,7 @@ app.layout = dbc.Container([
                     html.Div([
 
                         html.Button('Generate Data',
-                            id = 'Button_2', 
+                            id = 'EPGen_Button_GenerateData', 
                             className = "btn btn-secondary btn-lg col-12",
                             style = {
                                 'width':'90%',
@@ -557,13 +565,14 @@ app.layout = dbc.Container([
                                 },),
 
                         html.Button('Download Files',
-                            id = 'Button_3', 
+                            id = 'EPGen_Button_DownloadFiles', 
                             className = "btn btn-primary btn-lg col-12",
                             style = {
                                 'width':'90%',
                                 'margin-left':'5%',
                                 'margin-bottom':'5%'
                                 },),
+                        dcc.Download(id = 'EPGen_Download_DownloadFiles'),
                         
                         ],id = 'final_download',
                         hidden = True,
@@ -576,7 +585,7 @@ app.layout = dbc.Container([
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4,),
 
                 html.Button('End Session',
-                    id = 'Button_es_generation', 
+                    id = 'EPGen_Button_EndSession', 
                     className = "btn btn-primary btn-lg col-12",
                     style = {
                         'width':'98%',
@@ -1551,7 +1560,7 @@ def EPGen_Dropdown_SimReportFreq_Interaction(simReportFreq_selection):
     Output(component_id = 'temperature_schedules', component_property = 'options'),
     Input(component_id = 'EPGen_Radiobutton_EditSchedules', component_property = 'value'),
     prevent_initial_call = True)
-def EPGen_Dropdown_VariableSelection_Interaction(EPGen_Radiobutton_VariableSelection):
+def EPGen_Dropdown_EditSchedule_Interaction(EPGen_Radiobutton_VariableSelection):
     initial_run_folder_path = os.path.join(SIMULATION_FOLDERPATH, 'Initial_run_folder')
     idf_weather_folder_path = os.path.join(SIMULATION_FOLDERPATH, "idf_weather_folder")
     if EPGen_Radiobutton_VariableSelection == 1:
@@ -1967,6 +1976,393 @@ def EPGen_Button_UpdateSelectedSchedule_Interaction(people_schedules, equip_sche
 
     return update_selected_schedule
 
+@app.callback(
+    Output(component_id = 'download_variables', component_property = 'hidden', allow_duplicate = True),
+    Input(component_id = 'EPGen_Radiobutton_EditSchedules', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_RadioButton_EditSchedules_Interaction_2(EPGen_Radiobutton_VariableSelection):
+    
+    if EPGen_Radiobutton_VariableSelection == 2:
+
+        download_variables = False
+
+    return download_variables
+
+
+@app.callback(
+    Output(component_id = 'download_variables', component_property = 'hidden', allow_duplicate = True),
+    Input(component_id = 'done_updating_schedule', component_property = 'n_clicks'),
+    prevent_initial_call = True)
+def EPGen_Button_DoneUpdatingSchedule_Interaction(n_clicks):
+    
+    download_variables = False
+    
+    return download_variables
+
+@app.callback(
+    Output(component_id = 'final_download', component_property = 'hidden'),
+    Input(component_id = 'download_selection', component_property = 'value'),
+    prevent_initial_call = True)
+def EPGen_Checkbox_DownloadSelection_Interaction(download_selection):
+    
+    if download_selection != '':
+        
+        final_download = False
+    
+    return final_download
+
+@app.callback(
+    Output(component_id = 'EPGen_Button_GenerateData', component_property = 'children'),
+    State(component_id = 'download_selection', component_property = 'value'),
+    State(component_id = 'sim_run_period', component_property = 'start_date'),
+    State(component_id = 'sim_run_period', component_property = 'end_date'),
+    State(component_id = 'sim_TimeStep', component_property = 'value'),
+    State(component_id = 'simReportFreq_selection', component_property = 'value'),
+    State(component_id = 'EPGen_Radiobutton_VariableSelection', component_property = 'value'),
+    State(component_id = 'your_variable_selection', component_property = 'value'),
+    Input(component_id = 'EPGen_Button_GenerateData', component_property = 'n_clicks'),
+    prevent_initial_call = True)
+def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_date, Sim_TimeStep, Sim_OutputVariable_ReportingFrequency, Var_selection, your_vars, n_clicks):
+    
+    edited_idf_folder_path = os.path.join(SIMULATION_FOLDERPATH,"Edited_idf_folder")
+
+    # Creating final run folder and copying files to the path
+    final_run_folder_path = os.path.join(SIMULATION_FOLDERPATH, "Final_run_folder")
+
+    if os.path.isdir(final_run_folder_path):
+        z = 0
+    else:
+        os.mkdir(final_run_folder_path)    
+
+        for item in os.listdir(edited_idf_folder_path):
+            shutil.copy(os.path.join(edited_idf_folder_path,item), final_run_folder_path)
+
+    # Finding directory of .idf and .epw files
+    for file in os.listdir(final_run_folder_path):
+        if file.endswith(".idf"):
+            Final_IDF_FilePath = os.path.join(final_run_folder_path, file)
+
+        if file.endswith(".epw"):
+            Final_Weather_FilePath = os.path.join(final_run_folder_path, file)
+    
+    # Loading IDF File
+    Current_IDFFile = op.Epm.load(Final_IDF_FilePath)
+
+    # Editing RunPeriod
+    Current_IDF_RunPeriod = Current_IDFFile.RunPeriod.one()
+
+    IDF_FileYear, Sim_Start_Month, Sim_Start_Day = start_date.split('-')
+
+    _, Sim_End_Month, Sim_End_Day = end_date.split('-')
+
+    Current_IDF_RunPeriod['begin_day_of_month'] = Sim_Start_Day
+
+    Current_IDF_RunPeriod['begin_month'] = Sim_Start_Month
+
+    Current_IDF_RunPeriod['end_day_of_month'] = Sim_End_Day
+
+    Current_IDF_RunPeriod['end_month' ]= Sim_End_Month
+
+    # Editing TimeStep
+    Current_IDF_TimeStep = Current_IDFFile.TimeStep.one()
+
+    Current_IDF_TimeStep['number_of_timesteps_per_hour'] = int(60/Sim_TimeStep)
+
+    # Making Additional Folders
+    Sim_IDFWeatherFiles_FolderName = 'Sim_IDFWeatherFiles'
+    Sim_IDFWeatherFiles_FolderPath = os.path.join(final_run_folder_path, Sim_IDFWeatherFiles_FolderName)
+
+    Sim_OutputFiles_FolderName = 'Sim_OutputFiles'
+    Sim_OutputFiles_FolderPath = os.path.join(final_run_folder_path, Sim_OutputFiles_FolderName)
+
+    Sim_IDFProcessedData_FolderName = 'Sim_ProcessedData'
+    Sim_IDFProcessedData_FolderPath = os.path.join(final_run_folder_path, Sim_IDFProcessedData_FolderName)
+
+    # Checking if Folders Exist if not create Folders
+    if (os.path.isdir(Sim_IDFWeatherFiles_FolderPath)):
+ 
+        z = None
+        
+    else:
+        
+        os.mkdir(Sim_IDFWeatherFiles_FolderPath)
+        
+        os.mkdir(Sim_OutputFiles_FolderPath)
+        
+        os.mkdir(Sim_IDFProcessedData_FolderPath)
+
+    # Overwriting Edited IDF
+    Current_IDFFile.save(Final_IDF_FilePath)
+
+    # Saving IDF & EPW to Sim_IDFWeatherFiles
+    shutil.move(Final_IDF_FilePath, Sim_IDFWeatherFiles_FolderPath)
+
+    shutil.move(Final_Weather_FilePath, Sim_IDFWeatherFiles_FolderPath)
+
+    # Finding directory of .idf and .epw files
+    for file in os.listdir(Sim_IDFWeatherFiles_FolderPath):
+        if file.endswith(".idf"):
+            Results_IDF_FilePath = os.path.join(Sim_IDFWeatherFiles_FolderPath, file)
+
+        if file.endswith(".epw"):
+            Results_Weather_FilePath = os.path.join(Sim_IDFWeatherFiles_FolderPath, file)
+
+    # Based on selection of download
+    if download_selection == [1]:
+
+        # Sorting variable names
+        if Var_selection == 1:
+            Simulation_VariableNames = [var.replace('_', ' ') for var in OUR_VARIABLE_LIST]
+
+        elif Var_selection == 2:
+            Simulation_VariableNames = your_vars
+
+        # Loading the Edited IDF File
+        epm_Edited_IDFFile = op.Epm.load(Results_IDF_FilePath)
+
+        # Getting Output Variable from Edited IDF File
+        OutputVariable_QuerySet = epm_Edited_IDFFile.Output_Variable.one()
+
+        # FOR LOOP: For Each Variable in Simulation_VariableNames
+        for OutputVariable_Name in Simulation_VariableNames:
+
+            # Updating OutputVariable_QuerySet in the Special IDF File
+            OutputVariable_QuerySet['key_value'] = '*'
+
+            OutputVariable_QuerySet['reporting_frequency'] = Sim_OutputVariable_ReportingFrequency
+
+            OutputVariable_QuerySet['variable_name'] = OutputVariable_Name
+
+            # Saving Special IDF File
+            epm_Edited_IDFFile.save(Results_IDF_FilePath)
+
+            # Running Building Simulation to obtain current output variable
+            op.simulate(Results_IDF_FilePath, Results_Weather_FilePath, base_dir_path = Sim_OutputFiles_FolderPath)
+
+            # Moving Output Variable CSV file to Desired Folder
+            Current_CSV_FilePath = os.path.join(Sim_OutputFiles_FolderPath, "eplusout.csv")
+
+            New_OutputVariable_FileName = OutputVariable_Name.replace(' ','_') + '.csv'
+
+            MoveTo_CSV_FilePath = os.path.join(Sim_IDFProcessedData_FolderPath, New_OutputVariable_FileName)
+
+            shutil.move(Current_CSV_FilePath, MoveTo_CSV_FilePath)
+
+        # =============================================================================
+        # Convert and Save Output Variables .csv to.mat in Results Folder
+        # =============================================================================    
+
+        # Getting all .csv Files paths from Sim_IDFProcessedData_FolderPath
+        FileName_List = os.listdir(Sim_IDFProcessedData_FolderPath)
+
+        # Initializing CSV_FileName_List
+        CSV_FilePath_List = []
+
+        # FOR LOOP: For each file in Sim_IDFProcessedData_FolderPath
+        for file in FileName_List:
+            
+            # Check only .csv files 
+            if file.endswith('.csv'):
+                
+                # Appending .csv file paths to CSV_FilePath_List
+                CSV_FilePath_List.append(os.path.join(Sim_IDFProcessedData_FolderPath,file))
+
+        # Initializing IDF_OutputVariable_Dict
+        IDF_OutputVariable_Dict = {}
+
+        IDF_OutputVariable_ColumnName_List = []
+
+        Counter_OutputVariable = 0
+
+        # FOR LOOP: For Each .csv File in CSV_FilePath_List
+        for file_path in CSV_FilePath_List:
+            
+            # Reading .csv file in dataframe
+            Current_DF = pd.read_csv(file_path)
+
+            # Getting CurrentDF_1
+            if (Counter_OutputVariable == 0):
+                
+                # Keeping DateTime Column
+                Current_DF_1 = Current_DF
+                
+            else:
+                
+                # Dropping DateTime Column
+                Current_DF_1=Current_DF.drop(Current_DF.columns[[0]],axis=1)
+            
+            # Appending Column Names to IDF_OutputVariable_ColumnName_List
+            for ColumnName in Current_DF_1.columns:
+                
+                IDF_OutputVariable_ColumnName_List.append(ColumnName)
+                
+            # Getting File Name
+            FileName = file_path.split('\\')[-1].split('_.')[0]
+            
+            # Storing Current_DF in IDF_OutputVariable_Dict
+            IDF_OutputVariable_Dict[FileName] = Current_DF
+            
+            # Incrementing Counter_OutputVariable
+            Counter_OutputVariable = Counter_OutputVariable + 1
+
+        # Creating and saving DateTime to IDF_OutputVariable_Dict
+        DateTime_List = []
+
+        DateTime_Column = Current_DF['Date/Time']
+
+        for DateTime in DateTime_Column:
+            
+            DateTime_Split = DateTime.split(' ')
+            
+            Date_Split = DateTime_Split[1].split('/')
+            
+            Time_Split = DateTime_Split[3].split(':')
+
+            # Converting all 24th hour to 0th hour as hour must be in 0..23
+            if int(Time_Split[0]) == 24:
+                Time_Split[0] = 00
+            
+            DateTime_List.append(datetime.datetime(int(IDF_FileYear),int(Date_Split[0]),int(Date_Split[1]),int(Time_Split[0]),int(Time_Split[1]),int(Time_Split[2])))
+
+        IDF_OutputVariable_Dict['DateTime_List'] = DateTime_List
+
+        pickle.dump(IDF_OutputVariable_Dict, open(os.path.join(Sim_IDFProcessedData_FolderPath,"IDF_OutputVariables_DictDF.pickle"), "wb"))
+
+    elif download_selection == [2]:
+
+        # =============================================================================
+        # Process .eio Output File and save in Results Folder
+        # =============================================================================    
+
+        # Reading .eio Output File
+        Eio_OutputFile_Path = os.path.join(Sim_OutputFiles_FolderPath,'eplusout.eio') 
+
+        # Initializing Eio_OutputFile_Dict
+        Eio_OutputFile_Dict = {}
+
+        with open(Eio_OutputFile_Path) as f:
+            Eio_OutputFile_Lines = f.readlines()
+
+        # Removing Intro Lines
+        Eio_OutputFile_Lines = Eio_OutputFile_Lines[1:]
+
+        # FOR LOOP: For each category in .eio File
+        for Line_1 in Eio_OutputFile_Lines:
+
+            # IF ELSE LOOP: To check category
+            if (Line_1.find('!') >= 0):
+
+                print(Line_1 + '\n')
+
+                # Get the Key for the .eio File category
+                Pattern_1 = "<(.*?)>"
+
+                Category_Key = re.search(Pattern_1, Line_1).group(1)
+
+                # Get the Column Names for the .eio File category
+                DF_ColumnName_List = Line_1.split(',')[1:]
+
+                # Removing the '\n From the Last Name
+                DF_ColumnName_List[-1] = DF_ColumnName_List[-1].split('\n')[0]
+
+                # Removing Empty Element
+                if DF_ColumnName_List[-1] == ' ':
+                    DF_ColumnName_List = DF_ColumnName_List[:-1]
+
+                # Initializing DF_Index_List
+                DF_Index_List = []
+
+                # Initializing DF_Data_List
+                DF_Data_List = []
+
+                # FOR LOOP: For all elements of current .eio File category
+                for Line_2 in Eio_OutputFile_Lines:
+
+                    # IF ELSE LOOP: To check data row belongs to current Category
+                    if ((Line_2.find('!') == -1) and (Line_2.find(Category_Key) >= 0)):
+
+                        print(Line_2 + '\n')
+
+                        DF_ColumnName_List_Length = len(DF_ColumnName_List)
+
+                        # Split Line_2
+                        Line_2_Split = Line_2.split(',')
+
+                        # Removing the '\n From the Last Data
+                        Line_2_Split[-1] = Line_2_Split[-1].split('\n')[0]
+
+                        # Removing Empty Element
+                        if Line_2_Split[-1] == ' ':
+                            Line_2_Split = Line_2_Split[:-1]
+
+                        # Getting DF_Index_List element
+                        DF_Index_List.append(Line_2_Split[0])
+
+                        Length_Line2 = len(Line_2_Split[1:])
+
+                        Line_2_Split_1 = Line_2_Split[1:]
+
+                        # Filling up Empty Column
+                        if Length_Line2 < DF_ColumnName_List_Length:
+                            Len_Difference = DF_ColumnName_List_Length - Length_Line2
+
+                            for ii in range(Len_Difference):
+                                Line_2_Split_1.append('NA')
+
+                            # Getting DF_Data_List element
+                            DF_Data_List.append(Line_2_Split_1)
+
+                        else:
+                            # Getting DF_Data_List element
+                            DF_Data_List.append(Line_2_Split[1:])
+
+                    else:
+
+                        continue
+
+                # Creating DF_Table
+                DF_Table = pd.DataFrame(DF_Data_List, index=DF_Index_List, columns=DF_ColumnName_List)
+
+                # Adding DF_Table to the Eio_OutputFile_Dict
+                Eio_OutputFile_Dict[Category_Key] = DF_Table
+
+            else:
+
+                continue
+            
+        # Saving Eio_OutputFile_Dict as a .pickle File in Results Folder
+        pickle.dump(Eio_OutputFile_Dict, open(os.path.join(Sim_IDFProcessedData_FolderPath,"Eio_OutputFile.pickle"), "wb"))
+
+    button_text = "Data Generated"
+    
+    return button_text
+
+@app.callback(
+    Output(component_id = 'EPGen_Download_DownloadFiles', component_property = 'data'),
+    Input(component_id = 'EPGen_Button_DownloadFiles', component_property = 'n_clicks'),
+    prevent_initial_call = True)
+def EPGen_Button_GenerateData_Interaction(n_clicks):
+
+    Sim_IDFProcessedData_FolderName = 'Sim_ProcessedData'
+    Sim_IDFProcessedData_FolderPath = os.path.join(SIMULATION_FOLDERPATH, "Final_run_folder", Sim_IDFProcessedData_FolderName)
+
+    for item in os.listdir(Sim_IDFProcessedData_FolderPath):
+        if item.endswith(".pickle"):
+            download_path = os.path.join(Sim_IDFProcessedData_FolderPath,item)
+    return dcc.send_file(download_path)
+
+@app.callback(
+    Output(component_id = 'EPGen_Button_EndSession', component_property = 'children'),
+    Input(component_id = 'EPGen_Button_EndSession', component_property = 'n_clicks'),
+    prevent_initial_call = True)
+def EPGen_Button_EndSession_Interaction(n_clicks):
+
+    for dir in os.listdir(WORKSPACE_DIRECTORY):
+
+        shutil.rmtree(os.path.join(WORKSPACE_DIRECTORY, dir))
+
+    return "Session Completed"
+    
 # Running the App
 if __name__ == '__main__': 
     app.run_server(port=4050)
