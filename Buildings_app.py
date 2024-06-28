@@ -2232,7 +2232,10 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
 
         # =============================================================================
         # Process .eio Output File and save in Results Folder
-        # =============================================================================    
+        # =============================================================================  
+        # 
+        # Running Building Simulation to obtain current output variable
+        op.simulate(Results_IDF_FilePath, Results_Weather_FilePath, base_dir_path = Sim_OutputFiles_FolderPath)  
 
         # Reading .eio Output File
         Eio_OutputFile_Path = os.path.join(Sim_OutputFiles_FolderPath,'eplusout.eio') 
@@ -2333,22 +2336,253 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
         # Saving Eio_OutputFile_Dict as a .pickle File in Results Folder
         pickle.dump(Eio_OutputFile_Dict, open(os.path.join(Sim_IDFProcessedData_FolderPath,"Eio_OutputFile.pickle"), "wb"))
 
+    elif download_selection == [1,2]:
+
+        # Sorting variable names
+        if Var_selection == 1:
+            Simulation_VariableNames = [var.replace('_', ' ') for var in OUR_VARIABLE_LIST]
+
+        elif Var_selection == 2:
+            Simulation_VariableNames = your_vars
+
+        # Loading the Edited IDF File
+        epm_Edited_IDFFile = op.Epm.load(Results_IDF_FilePath)
+
+        # Getting Output Variable from Edited IDF File
+        OutputVariable_QuerySet = epm_Edited_IDFFile.Output_Variable.one()
+
+        # FOR LOOP: For Each Variable in Simulation_VariableNames
+        for OutputVariable_Name in Simulation_VariableNames:
+
+            # Updating OutputVariable_QuerySet in the Special IDF File
+            OutputVariable_QuerySet['key_value'] = '*'
+
+            OutputVariable_QuerySet['reporting_frequency'] = Sim_OutputVariable_ReportingFrequency
+
+            OutputVariable_QuerySet['variable_name'] = OutputVariable_Name
+
+            # Saving Special IDF File
+            epm_Edited_IDFFile.save(Results_IDF_FilePath)
+
+            # Running Building Simulation to obtain current output variable
+            op.simulate(Results_IDF_FilePath, Results_Weather_FilePath, base_dir_path = Sim_OutputFiles_FolderPath)
+
+            # Moving Output Variable CSV file to Desired Folder
+            Current_CSV_FilePath = os.path.join(Sim_OutputFiles_FolderPath, "eplusout.csv")
+
+            New_OutputVariable_FileName = OutputVariable_Name.replace(' ','_') + '.csv'
+
+            MoveTo_CSV_FilePath = os.path.join(Sim_IDFProcessedData_FolderPath, New_OutputVariable_FileName)
+
+            shutil.move(Current_CSV_FilePath, MoveTo_CSV_FilePath)
+
+        # =============================================================================
+        # Convert and Save Output Variables .csv to.mat in Results Folder
+        # =============================================================================    
+
+        # Getting all .csv Files paths from Sim_IDFProcessedData_FolderPath
+        FileName_List = os.listdir(Sim_IDFProcessedData_FolderPath)
+
+        # Initializing CSV_FileName_List
+        CSV_FilePath_List = []
+
+        # FOR LOOP: For each file in Sim_IDFProcessedData_FolderPath
+        for file in FileName_List:
+            
+            # Check only .csv files 
+            if file.endswith('.csv'):
+                
+                # Appending .csv file paths to CSV_FilePath_List
+                CSV_FilePath_List.append(os.path.join(Sim_IDFProcessedData_FolderPath,file))
+
+        # Initializing IDF_OutputVariable_Dict
+        IDF_OutputVariable_Dict = {}
+
+        IDF_OutputVariable_ColumnName_List = []
+
+        Counter_OutputVariable = 0
+
+        # FOR LOOP: For Each .csv File in CSV_FilePath_List
+        for file_path in CSV_FilePath_List:
+            
+            # Reading .csv file in dataframe
+            Current_DF = pd.read_csv(file_path)
+
+            # Getting CurrentDF_1
+            if (Counter_OutputVariable == 0):
+                
+                # Keeping DateTime Column
+                Current_DF_1 = Current_DF
+                
+            else:
+                
+                # Dropping DateTime Column
+                Current_DF_1=Current_DF.drop(Current_DF.columns[[0]],axis=1)
+            
+            # Appending Column Names to IDF_OutputVariable_ColumnName_List
+            for ColumnName in Current_DF_1.columns:
+                
+                IDF_OutputVariable_ColumnName_List.append(ColumnName)
+                
+            # Getting File Name
+            FileName = file_path.split('\\')[-1].split('_.')[0]
+            
+            # Storing Current_DF in IDF_OutputVariable_Dict
+            IDF_OutputVariable_Dict[FileName] = Current_DF
+            
+            # Incrementing Counter_OutputVariable
+            Counter_OutputVariable = Counter_OutputVariable + 1
+
+        # Creating and saving DateTime to IDF_OutputVariable_Dict
+        DateTime_List = []
+
+        DateTime_Column = Current_DF['Date/Time']
+
+        for DateTime in DateTime_Column:
+            
+            DateTime_Split = DateTime.split(' ')
+            
+            Date_Split = DateTime_Split[1].split('/')
+            
+            Time_Split = DateTime_Split[3].split(':')
+
+            # Converting all 24th hour to 0th hour as hour must be in 0..23
+            if int(Time_Split[0]) == 24:
+                Time_Split[0] = 00
+            
+            DateTime_List.append(datetime.datetime(int(IDF_FileYear),int(Date_Split[0]),int(Date_Split[1]),int(Time_Split[0]),int(Time_Split[1]),int(Time_Split[2])))
+
+        IDF_OutputVariable_Dict['DateTime_List'] = DateTime_List
+
+        pickle.dump(IDF_OutputVariable_Dict, open(os.path.join(Sim_IDFProcessedData_FolderPath,"IDF_OutputVariables_DictDF.pickle"), "wb"))
+
+        # =============================================================================
+        # Process .eio Output File and save in Results Folder
+        # =============================================================================   
+
+        # Reading .eio Output File
+        Eio_OutputFile_Path = os.path.join(Sim_OutputFiles_FolderPath,'eplusout.eio') 
+
+        # Initializing Eio_OutputFile_Dict
+        Eio_OutputFile_Dict = {}
+
+        with open(Eio_OutputFile_Path) as f:
+            Eio_OutputFile_Lines = f.readlines()
+
+        # Removing Intro Lines
+        Eio_OutputFile_Lines = Eio_OutputFile_Lines[1:]
+
+        # FOR LOOP: For each category in .eio File
+        for Line_1 in Eio_OutputFile_Lines:
+
+            # IF ELSE LOOP: To check category
+            if (Line_1.find('!') >= 0):
+
+                print(Line_1 + '\n')
+
+                # Get the Key for the .eio File category
+                Pattern_1 = "<(.*?)>"
+
+                Category_Key = re.search(Pattern_1, Line_1).group(1)
+
+                # Get the Column Names for the .eio File category
+                DF_ColumnName_List = Line_1.split(',')[1:]
+
+                # Removing the '\n From the Last Name
+                DF_ColumnName_List[-1] = DF_ColumnName_List[-1].split('\n')[0]
+
+                # Removing Empty Element
+                if DF_ColumnName_List[-1] == ' ':
+                    DF_ColumnName_List = DF_ColumnName_List[:-1]
+
+                # Initializing DF_Index_List
+                DF_Index_List = []
+
+                # Initializing DF_Data_List
+                DF_Data_List = []
+
+                # FOR LOOP: For all elements of current .eio File category
+                for Line_2 in Eio_OutputFile_Lines:
+
+                    # IF ELSE LOOP: To check data row belongs to current Category
+                    if ((Line_2.find('!') == -1) and (Line_2.find(Category_Key) >= 0)):
+
+                        print(Line_2 + '\n')
+
+                        DF_ColumnName_List_Length = len(DF_ColumnName_List)
+
+                        # Split Line_2
+                        Line_2_Split = Line_2.split(',')
+
+                        # Removing the '\n From the Last Data
+                        Line_2_Split[-1] = Line_2_Split[-1].split('\n')[0]
+
+                        # Removing Empty Element
+                        if Line_2_Split[-1] == ' ':
+                            Line_2_Split = Line_2_Split[:-1]
+
+                        # Getting DF_Index_List element
+                        DF_Index_List.append(Line_2_Split[0])
+
+                        Length_Line2 = len(Line_2_Split[1:])
+
+                        Line_2_Split_1 = Line_2_Split[1:]
+
+                        # Filling up Empty Column
+                        if Length_Line2 < DF_ColumnName_List_Length:
+                            Len_Difference = DF_ColumnName_List_Length - Length_Line2
+
+                            for ii in range(Len_Difference):
+                                Line_2_Split_1.append('NA')
+
+                            # Getting DF_Data_List element
+                            DF_Data_List.append(Line_2_Split_1)
+
+                        else:
+                            # Getting DF_Data_List element
+                            DF_Data_List.append(Line_2_Split[1:])
+
+                    else:
+
+                        continue
+
+                # Creating DF_Table
+                DF_Table = pd.DataFrame(DF_Data_List, index=DF_Index_List, columns=DF_ColumnName_List)
+
+                # Adding DF_Table to the Eio_OutputFile_Dict
+                Eio_OutputFile_Dict[Category_Key] = DF_Table
+
+            else:
+
+                continue
+            
+        # Saving Eio_OutputFile_Dict as a .pickle File in Results Folder
+        pickle.dump(Eio_OutputFile_Dict, open(os.path.join(Sim_IDFProcessedData_FolderPath,"Eio_OutputFile.pickle"), "wb"))
+
+        pickle_list = [os.path.join(Sim_IDFProcessedData_FolderPath,"IDF_OutputVariables_DictDF.pickle"), os.path.join(Sim_IDFProcessedData_FolderPath,"Eio_OutputFile.pickle")]
+        AppFuncs.compress(pickle_list, Sim_IDFProcessedData_FolderPath)
+
     button_text = "Data Generated"
     
     return button_text
 
 @app.callback(
     Output(component_id = 'EPGen_Download_DownloadFiles', component_property = 'data'),
+    State(component_id = 'download_selection', component_property = 'value'),
     Input(component_id = 'EPGen_Button_DownloadFiles', component_property = 'n_clicks'),
     prevent_initial_call = True)
-def EPGen_Button_GenerateData_Interaction(n_clicks):
+def EPGen_Button_GenerateData_Interaction(download_selection, n_clicks):
 
     Sim_IDFProcessedData_FolderName = 'Sim_ProcessedData'
     Sim_IDFProcessedData_FolderPath = os.path.join(SIMULATION_FOLDERPATH, "Final_run_folder", Sim_IDFProcessedData_FolderName)
 
     for item in os.listdir(Sim_IDFProcessedData_FolderPath):
-        if item.endswith(".pickle"):
-            download_path = os.path.join(Sim_IDFProcessedData_FolderPath,item)
+        if download_selection == [1] or download_selection == [2]:
+            if item.endswith(".pickle"):
+                download_path = os.path.join(Sim_IDFProcessedData_FolderPath,item)
+        elif download_selection == [1,2]:
+            if item.endswith(".zip"):
+                download_path = os.path.join(Sim_IDFProcessedData_FolderPath,item)
     return dcc.send_file(download_path)
 
 @app.callback(
