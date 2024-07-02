@@ -2722,7 +2722,8 @@ def EPAgg_RadioButton_AggregationVariables_Interaction(InputSelection, VariableS
     # Continue session -> copying files from previous session
     if InputSelection == 1:
 
-        SIMULATION_FOLDERPATH = os.path.join(WORKSPACE_DIRECTORY, 'sim1')
+        # For testing purposes
+        # SIMULATION_FOLDERPATH = os.path.join(WORKSPACE_DIRECTORY, 'sim1')
 
         # Copying pickle file & eio file from previous session 
         Sim_IDFProcessedData_FolderName = 'Sim_ProcessedData'
