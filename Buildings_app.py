@@ -24,6 +24,8 @@ import pickle
 import MyDashApp_Module as AppFuncs
 
 UPLOAD_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Uploads")
+UPLOAD_DIRECTORY_AGG_PICKLE = os.path.join(UPLOAD_DIRECTORY, "Pickle_Upload")
+UPLOAD_DIRECTORY_AGG_EIO = os.path.join(UPLOAD_DIRECTORY, "EIO_Upload")
 WORKSPACE_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Workspace")
 SIMULATION_FOLDERPATH = 'abc123'
 SIMULATION_FOLDERNAME = 'abc123'
@@ -611,7 +613,7 @@ app.layout = dbc.Container([
                     
                     # Input selection
                     dcc.RadioItems(
-                    id = 'input_selection',
+                    id = 'EPAgg_RadioButton_InputSelection',
                     labelStyle = {'display': 'block'},
                     options = [
                         {'label' : " Continue Session", 'value' : 1},
@@ -635,6 +637,7 @@ app.layout = dbc.Container([
                         # Upload Pickled Variable file
                         dcc.Upload(['Upload Pickled Variable file'],
                             className = 'center',
+                            id = 'EPAgg_Upload_Pickle',
                             style = {
                                 'width': '90%',
                                 'height': '40px',
@@ -650,6 +653,7 @@ app.layout = dbc.Container([
                         # Upload EIO file
                         dcc.Upload(['Upload EIO file'],
                             className = 'center',
+                            id = 'EPAgg_Upload_EIO',
                             style = {
                                 'width': '90%',
                                 'height': '40px',
@@ -661,7 +665,7 @@ app.layout = dbc.Container([
                                 'margin': '5%',
                                 }),
 
-                        ],id = 'upload_aggr_files',
+                        ],id = 'EPAgg_Div_UploadFiles',
                         hidden = True,
                         style = {
                             'borderWidth': '1px',
@@ -675,7 +679,7 @@ app.layout = dbc.Container([
                     # Aggregation Variables
                     html.Div([
                         dcc.RadioItems(
-                            id = 'aggr_variable_selection',
+                            id = 'EPAgg_RadioButton_AggregationVariables',
                             labelStyle = {'display': 'block'},
                             options = [
                                 {'label' : " Preselected Variables", 'value' : 1},
@@ -685,24 +689,40 @@ app.layout = dbc.Container([
                             className = 'ps-4 p-3',
                         ),
 
+                        html.Label("Preselected Variables",
+                            className = 'text-left ms-4'),
                         dcc.Dropdown(['Var1','Var2','Var3'], '',
-                            id='aggr_variables',
+                            id='EPAgg_DropDown_PreselectedVariables',
                             style = {
                                 'width': '95%',
                                 'margin-left': '2.5%',
                                 'margin-bottom': '2.5%'
                                 }),
 
-                    ],id = 'aggr_variable_details',
+                        html.Label("Select custom variables",
+                            className = 'text-left ms-4'),
+                        dcc.Dropdown(['Var1','Var2','Var3'], '',
+                            id='EPAgg_DropDown_CustomVariables',
+                            multi = True,
+                            style = {
+                                'width': '95%',
+                                'margin-left': '2.5%',
+                                'margin-bottom': '2.5%'
+                                }),
+
+                    ],id = 'EPAgg_Div_AggregationVariables',
                     hidden = True,
                     style = {
                         'borderWidth': '1px',
                         'borderStyle': 'solid',
                         'borderRadius': '5px',
-                        },)
+                        },),
+                    
+                    html.Br(),
 
                 ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6,),
 
+                
                 # Second Column
                 dbc.Col([
                     
@@ -738,18 +758,18 @@ app.layout = dbc.Container([
                                 #'margin-bottom': '2.5%'
                                 }),
 
-                        # Zone selection
+                        # Type of Aggregation
                         html.Label("Type of Aggregation",
                             className = 'text-left ms-4 mt-1'),
                         dcc.Dropdown(['Average','Weighted Floor Area Average','Weighted Volume Average'], '',
-                            id='type_selection',
+                            id='EPAgg_DropDown_TypeOfAggregation',
                             style = {
                                 'width': '95%',
                                 'margin-left': '2.5%', 
                                 'margin-bottom': '2.5%'  
                                 }),
 
-                    ],id = 'aggr_details',
+                    ],id = 'EPAgg_Div_AggregationDetails',
                     hidden = True,
                     style = {
                         'borderWidth': '1px',
@@ -779,15 +799,19 @@ app.layout = dbc.Container([
                                 'margin-bottom':'5%'
                                 },),
 
-                    ],id = 'aggr_download',
+                    ],id = 'EPAgg_Div_FinalDownload',
                     hidden = True,
                     style = {
                         'borderWidth': '1px',
                         'borderStyle': 'solid',
                         'borderRadius': '5px',
-                        },)
+                        },),
+                    
+                    html.Br(),
 
                 ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6,),
+
+                
 
                 html.Button('End Session',
                     id = 'Button_es_aggregation', 
@@ -2596,7 +2620,184 @@ def EPGen_Button_EndSession_Interaction(n_clicks):
         shutil.rmtree(os.path.join(WORKSPACE_DIRECTORY, dir))
 
     return "Session Completed"
+
+@app.callback(
+    Output(component_id = 'EPAgg_Div_UploadFiles', component_property = 'hidden'),
+    Output(component_id = 'EPAgg_Div_AggregationVariables', component_property = 'hidden'),
+    Input(component_id = 'EPAgg_RadioButton_InputSelection', component_property = 'value'),
+    prevent_initial_call = True)
+def EPAgg_RadioButton_InputSelection_Interaction(value):
     
+    if value == 1:
+        
+        upload_div = True
+        variable_div = False
+    
+    elif value == 2:
+        
+        upload_div = False
+        variable_div = False
+        
+    else:
+        
+        upload_div = True
+        variable_div = True
+        
+    return upload_div, variable_div
+
+@app.callback(
+    Output(component_id = 'EPAgg_Upload_Pickle', component_property = 'children'),
+    Input(component_id = 'EPAgg_Upload_Pickle', component_property = 'filename'),
+    State(component_id = 'EPAgg_Upload_Pickle', component_property = 'contents'),
+    prevent_initial_call = False)
+def EPAgg_Upload_Pickle_Interaction(filename, content):
+    if filename is not None and content is not None:
+        AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY_AGG_PICKLE)
+        message = filename + ' uploaded successfully'
+    
+    else:
+        message = 'Upload Pickled Variable file'
+
+    return message
+
+@app.callback(
+    Output(component_id = 'EPAgg_Upload_EIO', component_property = 'children'),
+    Input(component_id = 'EPAgg_Upload_EIO', component_property = 'filename'),
+    State(component_id = 'EPAgg_Upload_EIO', component_property = 'contents'),
+    prevent_initial_call = False)
+def EPAgg_Upload_EIO_Interaction(filename, content):
+    if filename is not None and content is not None:
+        AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY_AGG_EIO)
+        message = filename + ' uploaded successfully'
+    
+    else:
+        message = 'Upload EIO file'
+
+    return message
+
+@app.callback(
+    Output(component_id = 'EPAgg_Div_AggregationDetails', component_property = 'hidden'),
+    Input(component_id = 'EPAgg_RadioButton_AggregationVariables', component_property = 'value'),
+    Input(component_id = 'EPAgg_DropDown_CustomVariables', component_property = 'value'),
+    prevent_initial_call = True)
+def EPAgg_RadioButton_AggregationVariables_Interaction(selection, value):
+    
+    if selection == 1:
+        
+        div = False
+    
+    elif selection == 2:
+
+        div = True
+
+        if value != None:
+
+            div = False
+
+    else:
+        
+        div = True
+        
+    return div
+
+@app.callback(
+    Output(component_id = 'EPAgg_DropDown_PreselectedVariables', component_property = 'options'),
+    Output(component_id = 'EPAgg_DropDown_CustomVariables', component_property = 'options'),
+    State(component_id = 'EPAgg_RadioButton_InputSelection', component_property = 'value'),
+    Input(component_id = 'EPAgg_RadioButton_AggregationVariables', component_property = 'value'),
+    prevent_initial_call = True)
+def EPAgg_RadioButton_AggregationVariables_Interaction(InputSelection, VariableSelection):
+
+    # Creating Aggregation FolderPath
+    Aggregation_FolderPath = os.path.join(WORKSPACE_DIRECTORY, 'Aggregation')
+
+    if os.path.isdir(Aggregation_FolderPath):
+
+        z = 0
+
+    else:
+
+        os.mkdir(Aggregation_FolderPath)
+
+    # Continue session -> copying files from previous session
+    if InputSelection == 1:
+
+        SIMULATION_FOLDERPATH = os.path.join(WORKSPACE_DIRECTORY, 'sim1')
+
+        # Copying pickle file & eio file from previous session 
+        Sim_IDFProcessedData_FolderName = 'Sim_ProcessedData'
+        Sim_IDFProcessedData_FolderPath = os.path.join(SIMULATION_FOLDERPATH, "Final_run_folder", Sim_IDFProcessedData_FolderName)
+
+        for item in os.listdir(Sim_IDFProcessedData_FolderPath):
+
+            if item.endswith(".pickle"):
+
+                shutil.copy(os.path.join(Sim_IDFProcessedData_FolderPath,item), Aggregation_FolderPath)
+
+    # Upload files -> copying uploaded files and renaming
+    elif InputSelection == 2:
+
+        for item in os.listdir(UPLOAD_DIRECTORY_AGG_PICKLE):
+
+            shutil.copy(os.path.join(UPLOAD_DIRECTORY_AGG_PICKLE,item), os.path.join(Aggregation_FolderPath,'IDF_OutputVariables_DictDF.pickle'))
+
+        for item in os.listdir(UPLOAD_DIRECTORY_AGG_EIO):
+
+            shutil.copy(os.path.join(UPLOAD_DIRECTORY_AGG_EIO,item), os.path.join(Aggregation_FolderPath,'Eio_OutputFile.pickle'))
+
+    if VariableSelection == 1:
+
+        modified_OUR_VARIABLE_LIST = []
+
+        for item in OUR_VARIABLE_LIST:
+            # Remove the last underscore
+            item = item.rstrip('_')
+            # Replace remaining underscores with spaces
+            item = item.replace('_', ' ')
+            modified_OUR_VARIABLE_LIST.append(item)
+
+        modified_OUR_VARIABLE_LIST.sort()
+
+        pre_list = modified_OUR_VARIABLE_LIST
+
+        custom_list = []
+
+    elif VariableSelection == 2:
+
+        # Get Required Files from Sim_ProcessedData_FolderPath
+        IDF_OutputVariable_Dict_file = open(os.path.join(Aggregation_FolderPath,'IDF_OutputVariables_DictDF.pickle'),"rb")
+
+        IDF_OutputVariable_Dict = pickle.load(IDF_OutputVariable_Dict_file)
+
+        Eio_OutputFile_Dict_file = open(os.path.join(Aggregation_FolderPath,'Eio_OutputFile.pickle'),"rb")
+
+        Eio_OutputFile_Dict = pickle.load(Eio_OutputFile_Dict_file)
+   
+        custom_list = list(IDF_OutputVariable_Dict.keys())
+
+        custom_list.remove('DateTime_List')
+
+        pre_list = []
+
+    return pre_list, custom_list
+
+
+@app.callback(
+    Output(component_id = 'EPAgg_Div_FinalDownload', component_property = 'hidden'),
+    Input(component_id = 'EPAgg_DropDown_TypeOfAggregation', component_property = 'value'),
+    prevent_initial_call = True)
+def EPAgg_DropDown_TypeOfAggregation_Interaction(value):
+    
+    if value != None:
+        
+        div = False
+
+    else:
+        
+        div = True
+        
+    return div
+
 # Running the App
 if __name__ == '__main__': 
     app.run_server(port=4050)
