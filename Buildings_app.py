@@ -27,6 +27,8 @@ import MyDashApp_Module as AppFuncs
 UPLOAD_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Uploads")
 UPLOAD_DIRECTORY_AGG_PICKLE = os.path.join(UPLOAD_DIRECTORY, "Pickle_Upload")
 UPLOAD_DIRECTORY_AGG_EIO = os.path.join(UPLOAD_DIRECTORY, "EIO_Upload")
+UPLOAD_DIRECTORY_VIS_GENDATA = os.path.join(UPLOAD_DIRECTORY, "Generated_Data_Upload")
+UPLOAD_DIRECTORY_VIS_AGGDATA = os.path.join(UPLOAD_DIRECTORY, "Aggregated_Data_Upload")
 WORKSPACE_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Workspace")
 SIMULATION_FOLDERPATH = 'abc123'
 SIMULATION_FOLDERNAME = 'abc123'
@@ -506,7 +508,7 @@ app.layout = dbc.Container([
                         html.Label("Sub Level 1",
                             className = 'text-left ms-4'),
                         dcc.Dropdown(options = [],
-                            value = '',
+                            value = None,
                             id = 'level_1',
                             style = {
                                 'width': '95%',
@@ -517,7 +519,7 @@ app.layout = dbc.Container([
                         html.Label("Sub Level 2",
                             className = 'text-left ms-4'),
                         dcc.Dropdown(options = [],
-                            value = '',
+                            value = None,
                             id='level_2',
                             style = {
                                 'width': '95%',
@@ -528,7 +530,7 @@ app.layout = dbc.Container([
                         html.Label("Sub Level 3",
                             className = 'text-left ms-4'),
                         dcc.Dropdown(options = [],
-                            value = '',         
+                            value = None,         
                             id = 'level_3',
                             style = {
                                 'width': '95%',
@@ -538,7 +540,8 @@ app.layout = dbc.Container([
                         # Location selection
                         html.Label("Location",
                             className = 'text-left ms-4'),
-                        dcc.Dropdown(options = [], value = '',
+                        dcc.Dropdown(options = [],
+                            value = None,
                             id = 'location_selection',
                             style = {
                                 'width': '95%',
@@ -845,48 +848,59 @@ app.layout = dbc.Container([
             dbc.Row([
                 
                 dbc.Col([
+
+                    html.Div([
+
+                        html.H5("Data Source",
+                            className = 'text-left text-secondary mb-1 ms-3 mt-2'),
                     
-                    dcc.RadioItems(
-                            id = 'RadioItem1',
+                        dcc.RadioItems(
+                            id = 'EPVis_RadioButton_DataSource',
                             labelStyle = {'display': 'block'},
                             options = [
                                 {'label' : " Continue Session", 'value' : 1},
                                 {'label' : " Upload Files", 'value' : 2},
-                                {'label' : " Buildings Database", 'value' : 3}
-                                ]  ,
+                                ],
                             value = '',
-                            className = 'ps-4 p-3',
-                            style = {
-                                'width': '100%',
-                                'borderWidth': '1px',
-                                'borderStyle': 'solid',
-                                'borderRadius': '5px',
-                                }
+                            className = 'ps-4 p-2',
                         ),
-                    
-                    ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6), # width = 12
+                    ],
+                    style = {
+                        'width': '100%',
+                        'borderWidth': '1px',
+                        'borderStyle': 'solid',
+                        'borderRadius': '5px',
+                        }
+                    ),], xs = 12, sm = 12, md = 6, lg = 6, xl = 6), # width = 12
 
                 dbc.Col([
-                    
-                    dcc.RadioItems(
-                            id = 'RadioItem2',
+
+                    html.Div([
+
+                        html.H5("Data to be selected",
+                                className = 'text-left text-secondary mb-1 ms-3 mt-2'),
+                        
+                        dcc.RadioItems(
+                            id = 'EPVis_RadioButton_DataToBeSelected',
                             labelStyle = {'display': 'block'},
                             options = [
-                                {'label' : " Raw Data", 'value' : 1},
+                                {'label' : " Generated Data", 'value' : 1},
                                 {'label' : " Aggregated Data", 'value' : 2},
                                 {'label' : " Both", 'value' : 3}
                                 ]  ,
                             value = '',
-                            className = 'ps-4 p-3',
-                            style = {
-                                'width': '100%',
-                                'borderWidth': '1px',
-                                'borderStyle': 'solid',
-                                'borderRadius': '5px',
-                                }
+                            className = 'ps-4 p-2',
                         ),
-                    
-                    ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6), # width = 12
+                    ],
+                    id = 'EPVis_Div_Datatobeselected',
+                    hidden = True,
+                    style = {
+                        'width': '100%',
+                        'borderWidth': '1px',
+                        'borderStyle': 'solid',
+                        'borderRadius': '5px',
+                        }
+                    ),], xs = 12, sm = 12, md = 6, lg = 6, xl = 6), # width = 12
                 
                 ], justify = "center", align = "center"),
             
@@ -904,13 +918,10 @@ app.layout = dbc.Container([
             # Row 5, upload files
                 html.Div([
 
-                    # Upload Raw data
+                    # Upload Generated data
                     dcc.Upload(
-                        id='upload-data1',
-                        children=html.Div([
-                            'Drag and Drop or ',
-                            html.A('Select Files for Raw Data')
-                        ]),
+                        id='EPVis_Upload_GeneratedData',
+                        children='Drag and Drop or Select Files for Generated Data',
                         style={
                             'width': '98.5%',
                             'height': '60px',
@@ -921,10 +932,7 @@ app.layout = dbc.Container([
                             'textAlign': 'center',
                             'margin': '10px'
                         },
-                        # Allow multiple files to be uploaded
-                        multiple=True
                     ),
-                    html.Div(id='output-data-upload1'),
                     
                     # Break Row
                     dbc.Row([
@@ -939,11 +947,8 @@ app.layout = dbc.Container([
                     
                     # Upload Aggregated data
                     dcc.Upload(
-                        id='upload-data2',
-                        children=html.Div([
-                            'Drag and Drop or ',
-                            html.A('Select Files for Aggregated Data')
-                        ]),
+                        id='EPVis_Upload_AggregatedData',
+                        children='Drag and Drop or Select Files for Aggregated Data',
                         style={
                             'width': '98.5%',
                             'height': '60px',
@@ -954,13 +959,10 @@ app.layout = dbc.Container([
                             'textAlign': 'center',
                             'margin': '10px'
                         },
-                        # Allow multiple files to be uploaded
-                        multiple=True
                     ),
-                    html.Div(id='output-data-upload2'),
             
-                    ],id = 'upload_vis_files',
-                    hidden = False,
+                    ],id = 'EPVis_Div_UploadData',
+                    hidden = True,
                     style = {
                         'borderWidth': '1px',
                         'borderStyle': 'solid',
@@ -983,58 +985,29 @@ app.layout = dbc.Container([
             dbc.Row([
                 
                 dbc.Col([
-                    
-                    html.H3("Date Range from Uploaded File:",
-                            className = 'text-left text-secondary mb-4')
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
-                
-                ], justify = "left", align = "center"), 
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),  
-            
-            # Row 8
-            dcc.DatePickerRange(
-                id='my-date-picker-range1',
-                min_date_allowed=date(2000, 1, 1),
-                max_date_allowed=date(2021, 12, 31),
-                initial_visible_month=date(2020, 1, 1),
-                end_date=date(2020, 12, 31)
-            ),
-            html.Div(id='output-container-date-picker-range1'),
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]), 
-            
-            # Row 9
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.H3("Select Date Range for Visualization:",
-                            className = 'text-left text-secondary mb-4')
+
+                    html.Div([
+
+                        html.H5("Date Range from Uploaded File:",
+                            className = 'text-left text-secondary mb-2'),
+
+                        dcc.DatePickerRange(
+                            id='my-date-picker-range1',
+                            min_date_allowed=date(2000, 1, 1),
+                            max_date_allowed=date(2021, 12, 31),
+                            initial_visible_month=date(2020, 1, 1),
+                            end_date=date(2020, 12, 31)
+                        ),
+
+                    ],
+                    id = 'EPVis_Div_DateRangeUploadedFile',
+                    hidden = True
+                    ),
                     
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
                 
                 ], justify = "left", align = "center"), 
-            
+
             # Break Row
             dbc.Row([
                 
@@ -1044,17 +1017,33 @@ app.layout = dbc.Container([
                     
                     ], width = 12),
                 
-                ]),  
-            
-            # Row 10
-            dcc.DatePickerRange(
-                id='my-date-picker-range2',
-                min_date_allowed=date(2000, 1, 1),
-                max_date_allowed=date(2021, 12, 31),
-                initial_visible_month=date(2020, 1, 1),
-                end_date=date(2020, 12, 31)
-            ),
-            html.Div(id='output-container-date-picker-range2'),
+                ]),
+                
+            dbc.Row([
+                
+                dbc.Col([
+
+                    html.Div([                        
+
+                        html.H5("Select Date Range for Visualization:",
+                            className = 'text-left text-secondary mb-2'),
+
+                        dcc.DatePickerRange(
+                            id='my-date-picker-range2',
+                            min_date_allowed=date(2000, 1, 1),
+                            max_date_allowed=date(2021, 12, 31),
+                            initial_visible_month=date(2020, 1, 1),
+                            end_date=date(2020, 12, 31)
+                        ),
+
+                    ],
+                    id = 'EPVis_Div_DateRangeVis',
+                    hidden = True
+                    ),
+                    
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
+                
+                ], justify = "left", align = "center"),
             
             # Break Row
             dbc.Row([
@@ -1068,43 +1057,6 @@ app.layout = dbc.Container([
                 ]),
             
             dbc.Row([
-                        
-                dbc.Col([
-                    
-                    html.H4('Mean:')
-                    
-                    ], width = 3),
-                    
-
-                dbc.Col([
-                    
-                    html.H4('Variance:')
-                    
-                    ], width = 3),
-                    
-
-                dbc.Col([
-                    
-                    html.H4('Standard Deviation:')
-                    
-                    ], width = 3),
-                    
-
-                dbc.Col([
-                    
-                    html.H4('Range:')
-                    
-                    ], width = 3),
-                
-                ],id = 'vis_details',
-                #hidden = False,
-                style = {
-                    'borderWidth': '1px',
-                    'borderStyle': 'solid',
-                    'borderRadius': '5px',
-                    },), 
-            
-            dbc.Row([
                 
                 dbc.Col([
                     
@@ -1112,30 +1064,7 @@ app.layout = dbc.Container([
                     
                     ], width = 12),
                 
-                ]),
-            
-            # Row 11
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.H3("Distribution Plot:",
-                            className = 'text-left text-secondary mb-4')
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
-                
-                ], justify = "left", align = "center"), 
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),  
+                ]),               
             
             # Row 12
             dbc.Row([
@@ -1143,29 +1072,86 @@ app.layout = dbc.Container([
                 dbc.Col([
                     
                     html.H3("Select Variable:",
-                            className = 'text-left text-secondary mb-4')
+                            className = 'text-left text-secondary mb-2'),
                     
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
                 
                 ], justify = "left", align = "center"), 
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),  
         
             # Row 13
-            dcc.Dropdown(
-                ['Heating', 'Cooling', 'Humidification'],
-                ['Heating', 'Cooling'],
-                multi=True
-                ),
+            dbc.Row([
+                
+                dbc.Col([
+
+                    html.Div([
+
+                        html.H5("Generated Data",
+                            className = 'text-left text-secondary mb-2 ms-4 mt-2'),
+
+                        dcc.Dropdown([], '',
+                            id='EPVis_DropDown_GeneratedDataTables',
+                            style = {
+                                'width': '95%',
+                                'margin-left': '2.5%', 
+                                'margin-bottom': '2.5%'  
+                                }),
+
+                        dcc.Dropdown([], '',
+                            id='EPVis_DropDown_GeneratedDataColumns',
+                            style = {
+                                'width': '95%',
+                                'margin-left': '2.5%', 
+                                'margin-bottom': '2.5%'  
+                                }),
+
+                    ],
+                    id = 'EPVis_Div_SelectVariableGenerateData',
+                    hidden = True,
+                    style = {
+                                'width': '100%',
+                                'borderWidth': '1px',
+                                'borderStyle': 'solid',
+                                'borderRadius': '5px',
+                                }),
+                    
+                    ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6), # width = 12
+
+                dbc.Col([
+
+                    html.Div([
+
+                        html.H5("Aggregated Data",
+                            className = 'text-left text-secondary mb-2 ms-4 mt-2'),
+
+                        dcc.Dropdown([], '',
+                            id='EPVis_DropDown_AggregatedDataTables',
+                            style = {
+                                'width': '95%',
+                                'margin-left': '2.5%', 
+                                'margin-bottom': '2.5%'  
+                                }),
+
+                        dcc.Dropdown([], '',
+                            id='EPVis_DropDown_AggregatedDataColumns',
+                            style = {
+                                'width': '95%',
+                                'margin-left': '2.5%', 
+                                'margin-bottom': '2.5%'  
+                                }),
+
+                    ],
+                    id = 'EPVis_Div_SelectVariableAggregateData',
+                    hidden = True,
+                    style = {
+                                'width': '100%',
+                                'borderWidth': '1px',
+                                'borderStyle': 'solid',
+                                'borderRadius': '5px',
+                                }),
+                    
+                    ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6), # width = 12
+                
+                ], justify = "center", align = "center"),
             
             # Break Row
             dbc.Row([
@@ -1176,17 +1162,62 @@ app.layout = dbc.Container([
                     
                     ], width = 12),
                 
-                ]),  
+                ]),
             
+
+            dbc.Row(
+                dbc.Col(
+                    html.H3("Distribution Plot:", className = 'text-left text-secondary mb-2'),
+                    width = 12
+                ), # width = 12      
+                justify = "left",
+                align = "center"
+            ),
+
+            # Break Row
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Br()
+                    
+                    ], width = 12),
+                
+                ]),
+
             # Row 14
             dbc.Row([
                 
                 dbc.Col([
                     
-                    html.Button('Plot', id = 'Button_6', 
-                                className = "btn btn-primary btn-lg col-12") ,
+                    html.Button(
+                        'Generated Data',
+                        id = 'EPVis_Button_DistGeneratedData',
+                        hidden = True, 
+                        className = "btn btn-primary btn-lg col-12"
+                    ),
                     
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+                    ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
+
+                dbc.Col([
+
+                    html.Button(
+                        'Aggregated Data',
+                        id = 'EPVis_Button_DistAggregatedData',
+                        hidden = True, 
+                        className = "btn btn-primary btn-lg col-12"
+                    ),
+                    
+                    ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
+
+                dbc.Col([
+                    
+                    html.Button('Both',
+                                id = 'EPVis_Button_DistBothData',
+                                hidden = True, 
+                                className = "btn btn-primary btn-lg col-12"),
+                    
+                    ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
                 
                 ], justify = "center", align = "center"),   
 
@@ -1197,19 +1228,19 @@ app.layout = dbc.Container([
                     
                     html.Br()
                     
-                    ], width = 12),
+                ], width = 12),
                 
-                ]), 
-            
+            ]), 
+
             dbc.Row([
                 
                 dbc.Col([
                     
                     html.Br()
                     
-                    ], width = 12),
+                ], width = 12),
                 
-                ]),       
+            ]),       
             
             # Row 15
             dbc.Row([
@@ -1220,8 +1251,88 @@ app.layout = dbc.Container([
                     
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
                 
-                ], justify = "center", align = "center"),
+            ], justify = "center", align = "center"),
                 
+            dbc.Row([
+                dbc.Col([
+                    html.Br()
+                ], width = 12),
+            ]),
+
+            html.Div([
+                dbc.Row([
+                    dbc.Col([html.H4('Generated Data')], width = 2),
+                    dbc.Col([html.H4('Mean:')], width = 2),
+                    dbc.Col([html.H4('Variance:')], width = 2),
+                    dbc.Col([html.H4('Standard Deviation:')], width = 3),
+                    dbc.Col([html.H4('Range:')], width = 3),
+                ]),
+                ],id = 'EPVis_Row_GeneratedDataDetails',
+                hidden = True,
+                style = {
+                    'borderWidth': '1px',
+                    'borderStyle': 'solid',
+                    'borderRadius': '5px',
+                    },), 
+
+            dbc.Row([
+                dbc.Col([
+                    html.Br()
+                ], width = 12),
+                
+            ]),
+
+            html.Div([ 
+                dbc.Row([
+                    dbc.Col([html.H4('Aggregated Data')], width = 2),
+                    dbc.Col([html.H4('Mean:')], width = 2),
+                    dbc.Col([html.H4('Variance:')], width = 2),
+                    dbc.Col([html.H4('Standard Deviation:')], width = 3),
+                    dbc.Col([html.H4('Range:')], width = 3),
+                ]),
+                ],id = 'EPVis_Row_AggregatedDataDetails',
+                hidden = True,
+                style = {
+                    'borderWidth': '1px',
+                    'borderStyle': 'solid',
+                    'borderRadius': '5px',
+                    },),  
+            
+            # Break Row
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Br()
+                    
+                    ], width = 12),
+                
+                ]), 
+                
+            # Break Row
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Br()
+                    
+                    ], width = 12),
+                
+                ]),
+
+            # Row 11
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.H3("Scatter Plot:",
+                            className = 'text-left text-secondary mb-2')
+                    
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
+                
+                ], justify = "left", align = "center"), 
+            
+            # Break Row
             dbc.Row([
                 
                 dbc.Col([
@@ -1232,79 +1343,35 @@ app.layout = dbc.Container([
                 
                 ]), 
             
-            # Row 11
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.H3("Raw Data Plot:",
-                            className = 'text-left text-secondary mb-4')
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
-                
-                ], justify = "left", align = "center"), 
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),  
-            
-            # Row 12
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.H3("Select Variable:",
-                            className = 'text-left text-secondary mb-4')
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
-                
-                ], justify = "left", align = "center"), 
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),  
-        
-            # Row 13
-            dcc.Dropdown(
-                ['Heating', 'Cooling', 'Humidification'],
-                ['Heating', 'Cooling'],
-                multi=True
-                ),
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),  
-            
             # Row 14
             dbc.Row([
                 
                 dbc.Col([
                     
-                    html.Button('Plot', id = 'Button_7', 
-                                className = "btn btn-primary btn-lg col-12") ,
+                    html.Button('Generated Data',
+                                id = 'EPVis_Button_ScatterGeneratedData',
+                                hidden = True,
+                                className = "btn btn-primary btn-lg col-12"),
                     
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+                    ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
+
+                dbc.Col([
+
+                    html.Button('Aggregated Data',
+                                id = 'EPVis_Button_ScatterAggregatedData',
+                                hidden = True,
+                                className = "btn btn-primary btn-lg col-12"),
+                    
+                    ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
+
+                dbc.Col([
+                    
+                    html.Button('Both',
+                                id = 'EPVis_Button_ScatterBothData',
+                                hidden = True, 
+                                className = "btn btn-primary btn-lg col-12"),
+                    
+                    ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
                 
                 ], justify = "center", align = "center"),   
 
@@ -1339,6 +1406,17 @@ app.layout = dbc.Container([
                     
                     ], width = 12),
                 
+                ]), 
+                
+            # Break Row
+            dbc.Row([
+                
+                dbc.Col([
+                    
+                    html.Br()
+                    
+                    ], width = 12),
+                
                 ]),  
             
             # Row 16
@@ -1346,53 +1424,12 @@ app.layout = dbc.Container([
                 
                 dbc.Col([
                     
-                    html.H3("Aggregated Data Plot:",
-                            className = 'text-left text-secondary mb-4')
+                    html.H3("Time Series Plot:",
+                            className = 'text-left text-secondary mb-2')
                     
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
                 
-                ], justify = "left", align = "center"), 
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),  
-            
-            # Row 12
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.H3("Select Variable:",
-                            className = 'text-left text-secondary mb-4')
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
-                
-                ], justify = "left", align = "center"), 
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),  
-        
-            # Row 13
-            dcc.Dropdown(
-                ['Heating', 'Cooling', 'Humidification'],
-                ['Heating', 'Cooling'],
-                multi=True
-                ),
+                ], justify = "left", align = "center"),  
             
             # Break Row
             dbc.Row([
@@ -1410,10 +1447,30 @@ app.layout = dbc.Container([
                 
                 dbc.Col([
                     
-                    html.Button('Plot', id = 'Button_8', 
-                                className = "btn btn-primary btn-lg col-12") ,
+                    html.Button('Generated Data',
+                                id = 'EPVis_Button_TimeGeneratedData', 
+                                hidden = True,
+                                className = "btn btn-primary btn-lg col-12"),
                     
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+                    ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
+
+                dbc.Col([
+
+                    html.Button('Aggregated Data',
+                                id = 'EPVis_Button_TimeAggregatedData', 
+                                hidden = True,
+                                className = "btn btn-primary btn-lg col-12"),
+                    
+                    ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
+
+                dbc.Col([
+                    
+                    html.Button('Both',
+                                id = 'EPVis_Button_TimeBothData', 
+                                hidden = True,
+                                className = "btn btn-primary btn-lg col-12"),
+                    
+                    ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
                 
                 ], justify = "center", align = "center"),   
 
@@ -1564,7 +1621,7 @@ def EPGen_Dropdown_EPVersion_Interaction(version_selection):
     Input(component_id = 'location_selection', component_property = 'value'),
     prevent_initial_call = True)
 def EPGen_Dropdown_Location_Interaction(location_selection):
-    if location_selection == '' :
+    if location_selection == None :
         simulation_details = True
     else:
         simulation_details = False
@@ -1575,7 +1632,7 @@ def EPGen_Dropdown_Location_Interaction(location_selection):
     Input(component_id = 'simReportFreq_selection', component_property = 'value'),
     prevent_initial_call = True)
 def EPGen_Dropdown_SimReportFreq_Interaction(simReportFreq_selection):
-    if simReportFreq_selection != '':
+    if simReportFreq_selection is not None:
         generate_variables = False
     else:
         generate_variables = True
@@ -1740,10 +1797,10 @@ def EPGen_Dropdown_BuildingType_Interaction(buildingType_selection):
         level_3_list = []
         Weather_list = []
 
-    level_1_value = ''
-    level_2_value = ''
-    level_3_value = ''
-    Weather_value = ''
+    level_1_value = None
+    level_2_value = None
+    level_3_value = None
+    Weather_value = None
 
     return level_1_list, level_2_list, level_3_list, Weather_list, level_1_value, level_2_value, level_3_value, Weather_value
 
@@ -1768,8 +1825,8 @@ def EPGen_Dropdown_SubLevel1_Interaction(buildingType_selection, level_1):
         level_2_list = []
         level_3_list = []
 
-    level_2_value = ''
-    level_3_value = ''
+    level_2_value = None
+    level_3_value = None
 
     return level_2_list, level_3_list, level_2_value, level_3_value
 
@@ -1791,7 +1848,7 @@ def EPGen_Dropdown_SubLevel2_Interaction(buildingType_selection, level_1, level_
     else:
         level_3_list = []
 
-    level_3_value = ''
+    level_3_value = None
 
     return level_3_list, level_3_value
 
@@ -1830,7 +1887,8 @@ def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_
     
     elif database_selection == 2:
         for item in os.listdir(UPLOAD_DIRECTORY):
-            shutil.copy(os.path.join(UPLOAD_DIRECTORY,item), idf_weather_folder_path)
+            if os.path.isfile(os.path.join(UPLOAD_DIRECTORY,item)):
+                shutil.copy(os.path.join(UPLOAD_DIRECTORY,item), idf_weather_folder_path)
 
     # Appending Special.idf to selected idf file
     for file in os.listdir(idf_weather_folder_path):
@@ -3351,6 +3409,145 @@ def EPAgg_Button_Download_Interaction(n_clicks):
         if item.endswith(".pickle"):
             download_path = os.path.join(results_path,item)
     return dcc.send_file(download_path)
+
+@app.callback(
+    Output(component_id = 'EPVis_Div_Datatobeselected', component_property = 'hidden', allow_duplicate = True),
+    Output(component_id = 'EPVis_Div_UploadData', component_property = 'hidden'),
+    Input(component_id = 'EPVis_RadioButton_DataSource', component_property = 'value'),
+    prevent_initial_call = True)
+def EPVis_RadioButton_DataSource_Interaction(data_source):
+
+    if data_source == 1:
+        data_selection = False
+        upload_data = True
+    
+    elif data_source == 2:
+        data_selection = True
+        upload_data = False
+
+    else:
+        data_selection = True
+        upload_data = True
+
+    return data_selection, upload_data
+
+@app.callback(
+    Output(component_id = 'EPVis_Upload_GeneratedData', component_property = 'children'),
+    Input(component_id = 'EPVis_Upload_GeneratedData', component_property = 'filename'),
+    State(component_id = 'EPVis_Upload_GeneratedData', component_property = 'contents'),
+    prevent_initial_call = False)
+def EPVis_Upload_GeneratedData_Interaction(filename, content):
+    if filename is not None and content is not None:
+        AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY_VIS_GENDATA)
+        message = filename + ' uploaded successfully'
+    
+    else:
+        message = 'Drag and Drop or Select Files for Generated Data'
+
+    return message
+
+@app.callback(
+    Output(component_id = 'EPVis_Upload_AggregatedData', component_property = 'children'),
+    Output(component_id = 'EPVis_Div_Datatobeselected', component_property = 'hidden', allow_duplicate = True),
+    Input(component_id = 'EPVis_Upload_AggregatedData', component_property = 'filename'),
+    State(component_id = 'EPVis_Upload_AggregatedData', component_property = 'contents'),
+    prevent_initial_call = True)
+def EPVis_Upload_AggregatedData_Interaction(filename, content):
+    if filename is not None and content is not None:
+        AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY_VIS_AGGDATA)
+        message = filename + ' uploaded successfully'
+        data_selection = False
+    
+    else:
+        message = 'Drag and Drop or Select Files for Aggregated Data'
+        data_selection = True
+
+    return message, data_selection
+
+@app.callback(
+    Output(component_id = 'EPVis_Div_DateRangeUploadedFile', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Div_DateRangeVis', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Div_SelectVariableGenerateData', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Div_SelectVariableAggregateData', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Button_DistGeneratedData', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Button_DistAggregatedData', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Button_DistBothData', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Row_GeneratedDataDetails', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Row_AggregatedDataDetails', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Button_ScatterGeneratedData', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Button_ScatterAggregatedData', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Button_ScatterBothData', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Button_TimeGeneratedData', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Button_TimeAggregatedData', component_property = 'hidden'),
+    Output(component_id = 'EPVis_Button_TimeBothData', component_property = 'hidden'),
+    Input(component_id = 'EPVis_RadioButton_DataToBeSelected', component_property = 'value'),
+    prevent_initial_call = True)
+def EPVis_Radio_DataToBeSelected_Interaction(selection):
+    if selection == 1: # Generate Data
+        date_range1 = False
+        date_range2 = False
+        var_gendata = False
+        var_aggrdata = True
+        button_dist_gen = False
+        button_dist_agg = True
+        button_dist_both = True
+        mean_gen = False
+        mean_agg = True
+        button_scat_gen = False
+        button_scat_agg = True
+        button_scat_both = True
+        button_time_gen = False
+        button_time_agg = True
+        button_time_both = True
+    elif selection == 2: # Aggregated Data
+        date_range1 = False
+        date_range2 = False
+        var_gendata = True
+        var_aggrdata = False
+        button_dist_gen = True
+        button_dist_agg = False
+        button_dist_both = True
+        mean_gen = True
+        mean_agg = False
+        button_scat_gen = True
+        button_scat_agg = False
+        button_scat_both = True
+        button_time_gen = True
+        button_time_agg = False
+        button_time_both = True
+    elif selection == 3: # Both
+        date_range1 = False
+        date_range2 = False
+        var_gendata = False
+        var_aggrdata = False
+        button_dist_gen = False
+        button_dist_agg = False
+        button_dist_both = False
+        mean_gen = False
+        mean_agg = False
+        button_scat_gen = False
+        button_scat_agg = False
+        button_scat_both = False
+        button_time_gen = False
+        button_time_agg = False
+        button_time_both = False
+    else:
+        date_range1 = True
+        date_range2 = True
+        var_gendata = True
+        var_aggrdata = True
+        button_dist_gen = True
+        button_dist_agg = True
+        button_dist_both = True
+        mean_gen = True
+        mean_agg = True
+        button_scat_gen = True
+        button_scat_agg = True
+        button_scat_both = True
+        button_time_gen = True
+        button_time_agg = True
+        button_time_both = True
+    return date_range1, date_range2, var_gendata, var_aggrdata, button_dist_gen, button_dist_agg, button_dist_both, mean_gen, mean_agg, button_scat_gen, button_scat_agg, button_scat_both, button_time_gen, button_time_agg, button_time_both
 
 # Running the App
 if __name__ == '__main__': 

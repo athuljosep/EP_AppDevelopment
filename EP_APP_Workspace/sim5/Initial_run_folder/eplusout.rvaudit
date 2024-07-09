@@ -1,0 +1,16 @@
+ ReadVarsESO
+ processing:.ASHRAE901_OfficeSmall_STD2013_Seattle.rvi
+ input file:eplusout.eso
+ output file:eplusout.csv
+ getting all vars from:eplusout.eso
+  number variables requested for output=           5
+ ReadVars Run Time=00hr 00min  0.39sec
+ ReadVarsESO program completed successfully.
+ ReadVarsESO
+ processing:.ASHRAE901_OfficeSmall_STD2013_Seattle.mvi
+ input file:eplusout.mtr
+ output file:eplusmtr.csv
+ getting all vars from:eplusout.mtr
+  number variables requested for output=           3
+ ReadVars Run Time=00hr 00min  0.09sec
+ ReadVarsESO program completed successfully.
