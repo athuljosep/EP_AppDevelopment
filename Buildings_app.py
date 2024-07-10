@@ -27,8 +27,7 @@ import MyDashApp_Module as AppFuncs
 UPLOAD_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Uploads")
 UPLOAD_DIRECTORY_AGG_PICKLE = os.path.join(UPLOAD_DIRECTORY, "Pickle_Upload")
 UPLOAD_DIRECTORY_AGG_EIO = os.path.join(UPLOAD_DIRECTORY, "EIO_Upload")
-UPLOAD_DIRECTORY_VIS_GENDATA = os.path.join(UPLOAD_DIRECTORY, "Generated_Data_Upload")
-UPLOAD_DIRECTORY_VIS_AGGDATA = os.path.join(UPLOAD_DIRECTORY, "Aggregated_Data_Upload")
+UPLOAD_DIRECTORY_VIS = os.path.join(UPLOAD_DIRECTORY, "Visualization")
 WORKSPACE_DIRECTORY = os.path.join(os.getcwd(), "EP_APP_Workspace")
 SIMULATION_FOLDERPATH = 'abc123'
 SIMULATION_FOLDERNAME = 'abc123'
@@ -89,20 +88,20 @@ app.layout = dbc.Container([
     dcc.Tabs([
 
 #################################################################################################
-        
+
 # # # # # #  EP Generation Tab # # # # # # # # #
 
 #################################################################################################
-        
+
         # EP Generation Tab
         dcc.Tab(label='EP Generation', className = 'text-center text-primary mb-4', children=[
-           
+
             # Row 1
             dbc.Row([
-                
+
                 # Column 1
                 dbc.Col([
-                    
+
                     html.Br(),
 
                     # Box 11 C1
@@ -120,7 +119,7 @@ app.layout = dbc.Container([
                                 'text-align': 'center',
                                 'font-size': '24px'
                                 },),
-                     
+
                         ],id = 'create_directory',
                         style = {
                             # 'borderWidth': '1px',
@@ -148,7 +147,7 @@ app.layout = dbc.Container([
                             'borderRadius': '5px',
                             }
                         ),
-                    
+
                     html.Br(),
 
                     # Box 2 C1
@@ -185,7 +184,6 @@ app.layout = dbc.Container([
                                 'margin': '5%',
                                 }),
 
-                        
                         # Version selection
                         dbc.Stack([
                             html.Label("Energy Plus Version:",
@@ -218,8 +216,9 @@ app.layout = dbc.Container([
                         # Time-step selection
                         dbc.Stack([
                             html.Label("Time Step:",
-                                className = 'text'), 
-                            daq.NumericInput(id = 'sim_TimeStep', 
+                                className = 'text'),
+                            daq.NumericInput(
+                                id = 'sim_TimeStep', 
                                 value = 5,
                                 style = {
                                     'margin-left':'28%'
@@ -228,7 +227,7 @@ app.layout = dbc.Container([
                             style = {
                                 'margin': '5%',
                                 }),
-                        
+
                         # Simulation run period
                         html.Label("Simulation Run Period:",
                                 className = 'text', style={'margin-left': '5%'}),
@@ -252,7 +251,7 @@ app.layout = dbc.Container([
                         # Simulation reporting frequency selection
                         dbc.Stack([
                             html.Label("Simulation Reporting Frequency:",
-                                className = 'text'), 
+                                className = 'text'),
                             dcc.Dropdown(['timestep','hourly','detailed','daily','monthly','runperiod','environment','annual'], '',
                                 id = 'simReportFreq_selection',
                                 style = {
@@ -262,7 +261,7 @@ app.layout = dbc.Container([
                             ],direction = "horizontal",
                             style = {
                                 'margin': '5%',
-                                }), 
+                                }),
 
                         ],id = 'simulation_details',
                         hidden = True,
@@ -271,11 +270,10 @@ app.layout = dbc.Container([
                             'borderStyle': 'solid',
                             'borderRadius': '5px',
                             },),
-                    
+
                     html.Br(),
 
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
-                
 
                 # Column 2
                 dbc.Col([
@@ -296,7 +294,7 @@ app.layout = dbc.Container([
                         dcc.Dropdown(options = [],
                             value = '',
                             id = 'your_variable_selection',
-                            multi = True, 
+                            multi = True,
                             style = {
                                 'width':'95%',
                                 'margin-left':'2.5%',
@@ -343,7 +341,7 @@ app.layout = dbc.Container([
                                 'margin-bottom':'5%'
                                 }
                             ),
-                            
+
                             ],id = 'generate_variables',
                             hidden = True,
                             style = {
@@ -362,7 +360,7 @@ app.layout = dbc.Container([
                             className = 'ms-4'),
                         dcc.Dropdown(options = [],
                             value = '',
-                            id = 'people_schedules', 
+                            id = 'people_schedules',
                             style = {
                                 'width':'95%',
                                 'margin-left':'2.5%',
@@ -373,7 +371,7 @@ app.layout = dbc.Container([
                             className = 'ms-4'),
                         dcc.Dropdown(options = [],
                             value = '',
-                            id = 'equip_schedules', 
+                            id = 'equip_schedules',
                             style = {
                                 'width':'95%',
                                 'margin-left':'2.5%',
@@ -384,7 +382,7 @@ app.layout = dbc.Container([
                             className = 'ms-4'),
                         dcc.Dropdown(options = [],
                             value = '',
-                            id = 'light_schedules', 
+                            id = 'light_schedules',
                             style = {
                                 'width':'95%',
                                 'margin-left':'2.5%',
@@ -395,18 +393,18 @@ app.layout = dbc.Container([
                             className = 'ms-4'),
                         dcc.Dropdown(options = [],
                             value = '',
-                            id = 'heating_schedules', 
+                            id = 'heating_schedules',
                             style = {
                                 'width':'95%',
                                 'margin-left':'2.5%',
                                 'margin-bottom':'5%'
                                 }),
-                        
+
                         html.H6("Cooling",
                             className = 'ms-4'),
                         dcc.Dropdown(options = [],
                             value = '',
-                            id = 'cooling_schedules', 
+                            id = 'cooling_schedules',
                             style = {
                                 'width':'95%',
                                 'margin-left':'2.5%',
@@ -417,13 +415,13 @@ app.layout = dbc.Container([
                             className = 'ms-4'),
                         dcc.Dropdown(options = [],
                             value = '',
-                            id = 'temperature_schedules', 
+                            id = 'temperature_schedules',
                             style = {
                                 'width':'95%',
                                 'margin-left':'2.5%',
                                 'margin-bottom':'5%'
                                 }),
-                        
+
                         html.H6("Paste your custom schedule",
                             className = 'ms-4'),
                         dcc.Textarea(
@@ -435,15 +433,15 @@ app.layout = dbc.Container([
                         ),
 
                         html.Button('Select single schedule',
-                            id = 'update_selected_schedule', 
+                            id = 'update_selected_schedule',
                             className = "btn btn-secondary btn-lg col-12",
                             style = {
                                 'width':'90%',
                                 'margin':'5%'
                                 },),
-                        
+
                         html.Button('Done Updating Schedule',
-                            id = 'done_updating_schedule', 
+                            id = 'done_updating_schedule',
                             className = "btn btn-secondary btn-lg col-12",
                             style = {
                                 'width':'90%',
@@ -457,7 +455,7 @@ app.layout = dbc.Container([
                             'borderStyle': 'solid',
                             'borderRadius': '5px',
                             },),
-                    
+
                     html.Br(),
 
                     # Box 3 C2
@@ -473,7 +471,7 @@ app.layout = dbc.Container([
                                 'width':'95%',
                                 'margin':'5%',
                             }),
-                        
+
                         ],id = 'download_variables',
                         hidden = True,
                         style = {
@@ -488,7 +486,7 @@ app.layout = dbc.Container([
 
                 # Column 3
                 dbc.Col([
-                    
+
                     html.Br(),
 
                     # Box 1 C3
@@ -530,7 +528,7 @@ app.layout = dbc.Container([
                         html.Label("Sub Level 3",
                             className = 'text-left ms-4'),
                         dcc.Dropdown(options = [],
-                            value = None,         
+                            value = None,
                             id = 'level_3',
                             style = {
                                 'width': '95%',
@@ -558,12 +556,12 @@ app.layout = dbc.Container([
                             }),
 
                     html.Br(),
-                    
+
                     # Box 2 C3
                     html.Div([
 
                         html.Button('Generate Data',
-                            id = 'EPGen_Button_GenerateData', 
+                            id = 'EPGen_Button_GenerateData',
                             className = "btn btn-secondary btn-lg col-12",
                             style = {
                                 'width':'90%',
@@ -571,7 +569,7 @@ app.layout = dbc.Container([
                                 },),
 
                         html.Button('Download Files',
-                            id = 'EPGen_Button_DownloadFiles', 
+                            id = 'EPGen_Button_DownloadFiles',
                             className = "btn btn-primary btn-lg col-12",
                             style = {
                                 'width':'90%',
@@ -579,7 +577,7 @@ app.layout = dbc.Container([
                                 'margin-bottom':'5%'
                                 },),
                         dcc.Download(id = 'EPGen_Download_DownloadFiles'),
-                        
+
                         ],id = 'final_download',
                         hidden = True,
                         style = {
@@ -591,30 +589,30 @@ app.layout = dbc.Container([
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4,),
 
                 html.Button('End Session',
-                    id = 'EPGen_Button_EndSession', 
+                    id = 'EPGen_Button_EndSession',
                     className = "btn btn-primary btn-lg col-12",
                     style = {
                         'width':'98%',
                         },),
 
-                ], justify = "center", align = "center"),  
-            
+                ], justify = "center", align = "center"),
+
         ]),
-        
+
 #################################################################################################
-        
+
 # # # # # #  Aggregation Tab # # # # # # # # #
 
 #################################################################################################
-        
-        
+
+
         dcc.Tab(label = 'Aggregation', className = 'text-center text-primary mb-4', children = [
 
             dbc.Row([
-                
+
                 # First Column
                 dbc.Col([
-                    
+
                     # Input selection
                     dcc.RadioItems(
                     id = 'EPAgg_RadioButton_InputSelection',
@@ -721,15 +719,15 @@ app.layout = dbc.Container([
                         'borderStyle': 'solid',
                         'borderRadius': '5px',
                         },),
-                    
+
                     html.Br(),
 
                 ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6,),
 
-                
+
                 # Second Column
                 dbc.Col([
-                    
+
                     # Box 1 C2
                     html.Div([
 
@@ -753,7 +751,7 @@ app.layout = dbc.Container([
                             value = '',
                             className = 'ps-4 p-3',
                         ),
-
+                        
                         html.Label("Input Custom Aggregation Zone List (No spaces, only \",\" and \";\" for seperators)",
                             className = 'text-left ms-4 mt-1'),
                         dcc.Textarea(
@@ -793,7 +791,7 @@ app.layout = dbc.Container([
                     html.Div([
 
                         html.Button('Aggregate',
-                            id = 'EPAgg_Button_Aggregate', 
+                            id = 'EPAgg_Button_Aggregate',
                             className = "btn btn-secondary btn-lg col-12",
                             style = {
                                 'width':'90%',
@@ -801,7 +799,7 @@ app.layout = dbc.Container([
                                 },),
 
                         html.Button('Download',
-                            id = 'EPAgg_Button_Download', 
+                            id = 'EPAgg_Button_Download',
                             className = "btn btn-primary btn-lg col-12",
                             style = {
                                 'width':'90%',
@@ -817,12 +815,10 @@ app.layout = dbc.Container([
                         'borderStyle': 'solid',
                         'borderRadius': '5px',
                         },),
-                    
+
                     html.Br(),
 
                 ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6,),
-
-                
 
                 html.Button('End Session',
                     id = 'Button_es_aggregation', 
@@ -833,27 +829,27 @@ app.layout = dbc.Container([
                         },),
 
                 ])
-            ]), 
+            ]),
 
 #################################################################################################
-        
+
 # # # # # #  Visualization & Analysis Tab # # # # # # # # #
 
 #################################################################################################
-        
-        
+
+
         dcc.Tab(label = 'Visualization & Analysis', className = 'text-center text-primary mb-4', children = [
 
             # Row 3
             dbc.Row([
-                
+
                 dbc.Col([
 
                     html.Div([
 
                         html.H5("Data Source",
                             className = 'text-left text-secondary mb-1 ms-3 mt-2'),
-                    
+
                         dcc.RadioItems(
                             id = 'EPVis_RadioButton_DataSource',
                             labelStyle = {'display': 'block'},
@@ -879,7 +875,7 @@ app.layout = dbc.Container([
 
                         html.H5("Data to be selected",
                                 className = 'text-left text-secondary mb-1 ms-3 mt-2'),
-                        
+
                         dcc.RadioItems(
                             id = 'EPVis_RadioButton_DataToBeSelected',
                             labelStyle = {'display': 'block'},
@@ -901,20 +897,20 @@ app.layout = dbc.Container([
                         'borderRadius': '5px',
                         }
                     ),], xs = 12, sm = 12, md = 6, lg = 6, xl = 6), # width = 12
-                
+
                 ], justify = "center", align = "center"),
-            
+
             # Break Row
             dbc.Row([
-                
+
                 dbc.Col([
-                    
+
                     html.Br()
-                    
+
                     ], width = 12),
-                
-                ]),  
-            
+
+                ]),
+
             # Row 5, upload files
                 html.Div([
 
@@ -933,18 +929,18 @@ app.layout = dbc.Container([
                             'margin': '10px'
                         },
                     ),
-                    
+
                     # Break Row
                     dbc.Row([
-                        
+
                         dbc.Col([
-                            
+
                             html.Br()
-                            
+
                             ], width = 12),
-                        
-                        ]),  
-                    
+
+                        ]),
+
                     # Upload Aggregated data
                     dcc.Upload(
                         id='EPVis_Upload_AggregatedData',
@@ -960,7 +956,7 @@ app.layout = dbc.Container([
                             'margin': '10px'
                         },
                     ),
-            
+
                     ],id = 'EPVis_Div_UploadData',
                     hidden = True,
                     style = {
@@ -972,18 +968,18 @@ app.layout = dbc.Container([
 
             # Break Row
             dbc.Row([
-                
+
                 dbc.Col([
-                    
+
                     html.Br()
-                    
+
                     ], width = 12),
-                
+
                 ]),
-            
+
             # Row 7
             dbc.Row([
-                
+
                 dbc.Col([
 
                     html.Div([
@@ -992,10 +988,11 @@ app.layout = dbc.Container([
                             className = 'text-left text-secondary mb-2'),
 
                         dcc.DatePickerRange(
-                            id='my-date-picker-range1',
+                            id='EPVis_DatePickerRange_UploadedFile',
                             min_date_allowed=date(2000, 1, 1),
                             max_date_allowed=date(2021, 12, 31),
                             initial_visible_month=date(2020, 1, 1),
+                            start_date=date(2020, 1, 1),
                             end_date=date(2020, 12, 31)
                         ),
 
@@ -1003,59 +1000,58 @@ app.layout = dbc.Container([
                     id = 'EPVis_Div_DateRangeUploadedFile',
                     hidden = True
                     ),
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
-                
-                ], justify = "left", align = "center"), 
+
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+
+                ], justify = "left", align = "center"),
 
             # Break Row
             dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),
-                
-            dbc.Row([
-                
+
                 dbc.Col([
 
-                    html.Div([                        
+                    html.Br()
+
+                    ], width = 12),
+
+                ]),
+
+            dbc.Row([
+
+                dbc.Col([
+
+                    html.Div([
 
                         html.H5("Select Date Range for Visualization:",
                             className = 'text-left text-secondary mb-2'),
 
                         dcc.DatePickerRange(
-                            id='my-date-picker-range2',
+                            id='EPVis_DatePickerRange_Visualization',
                             min_date_allowed=date(2000, 1, 1),
                             max_date_allowed=date(2021, 12, 31),
                             initial_visible_month=date(2020, 1, 1),
-                            end_date=date(2020, 12, 31)
                         ),
 
                     ],
                     id = 'EPVis_Div_DateRangeVis',
                     hidden = True
                     ),
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
-                
+
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+
                 ], justify = "left", align = "center"),
-            
+
             # Break Row
             dbc.Row([
-                
+
                 dbc.Col([
-                    
+
                     html.Br()
-                    
+
                     ], width = 12),
-                
+
                 ]),
-            
+
             dbc.Row([
                 
                 dbc.Col([
@@ -1649,9 +1645,8 @@ def EPGen_Dropdown_SimReportFreq_Interaction(simReportFreq_selection):
     Output(component_id = 'temperature_schedules', component_property = 'options'),
     Input(component_id = 'EPGen_Radiobutton_EditSchedules', component_property = 'value'),
     prevent_initial_call = True)
-def EPGen_Dropdown_EditSchedule_Interaction(EPGen_Radiobutton_VariableSelection):
+def EPGen_RadioButton_EditSchedule_Interaction(EPGen_Radiobutton_VariableSelection):
     initial_run_folder_path = os.path.join(SIMULATION_FOLDERPATH, 'Initial_run_folder')
-    idf_weather_folder_path = os.path.join(SIMULATION_FOLDERPATH, "idf_weather_folder")
     if EPGen_Radiobutton_VariableSelection == 1:
         schedules = False
         eio_FilePath = os.path.join(initial_run_folder_path, "eplusout.eio")
@@ -1864,7 +1859,7 @@ def EPGen_Dropdown_SubLevel2_Interaction(buildingType_selection, level_1, level_
     State(component_id = 'location_selection', component_property = 'value'),
     Input(component_id = 'EPGen_Button_GenerateVariables', component_property = 'n_clicks'),
     prevent_initial_call = True)
-def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_selection, level_1, level_2, level_3, location_selection, EPGen_Button_GenerateVariables):
+def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_selection, level_1, level_2, level_3, location_selection, n_clicks):
  
     # Creating idf_weather_folder
     idf_weather_folder_path = os.path.join(SIMULATION_FOLDERPATH, "idf_weather_folder")
@@ -2661,7 +2656,7 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
     State(component_id = 'download_selection', component_property = 'value'),
     Input(component_id = 'EPGen_Button_DownloadFiles', component_property = 'n_clicks'),
     prevent_initial_call = True)
-def EPGen_Button_GenerateData_Interaction(download_selection, n_clicks):
+def EPGen_Button_DownloadFiles_Interaction(download_selection, n_clicks):
 
     Sim_IDFProcessedData_FolderName = 'Sim_ProcessedData'
     Sim_IDFProcessedData_FolderPath = os.path.join(SIMULATION_FOLDERPATH, "Final_run_folder", Sim_IDFProcessedData_FolderName)
@@ -2746,7 +2741,7 @@ def EPAgg_Upload_EIO_Interaction(filename, content):
     Input(component_id = 'EPAgg_RadioButton_AggregationVariables', component_property = 'value'),
     Input(component_id = 'EPAgg_DropDown_CustomVariables', component_property = 'value'),
     prevent_initial_call = True)
-def EPAgg_RadioButton_AggregationVariables_Interaction(selection, value):
+def EPAgg_DropDown_AggregationVariables_Interaction(selection, value):
     
     if selection == 1:
         
@@ -3438,7 +3433,7 @@ def EPVis_RadioButton_DataSource_Interaction(data_source):
     prevent_initial_call = False)
 def EPVis_Upload_GeneratedData_Interaction(filename, content):
     if filename is not None and content is not None:
-        AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY_VIS_GENDATA)
+        AppFuncs.save_file('Generated.pickle', content, UPLOAD_DIRECTORY_VIS)
         message = filename + ' uploaded successfully'
     
     else:
@@ -3454,10 +3449,9 @@ def EPVis_Upload_GeneratedData_Interaction(filename, content):
     prevent_initial_call = True)
 def EPVis_Upload_AggregatedData_Interaction(filename, content):
     if filename is not None and content is not None:
-        AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY_VIS_AGGDATA)
+        AppFuncs.save_file('Aggregated.pickle', content, UPLOAD_DIRECTORY_VIS)
         message = filename + ' uploaded successfully'
         data_selection = False
-    
     else:
         message = 'Drag and Drop or Select Files for Aggregated Data'
         data_selection = True
@@ -3480,9 +3474,19 @@ def EPVis_Upload_AggregatedData_Interaction(filename, content):
     Output(component_id = 'EPVis_Button_TimeGeneratedData', component_property = 'hidden'),
     Output(component_id = 'EPVis_Button_TimeAggregatedData', component_property = 'hidden'),
     Output(component_id = 'EPVis_Button_TimeBothData', component_property = 'hidden'),
+    Output(component_id = 'EPVis_DatePickerRange_UploadedFile', component_property = 'min_date_allowed'),
+    Output(component_id = 'EPVis_DatePickerRange_UploadedFile', component_property = 'max_date_allowed'),
+    Output(component_id = 'EPVis_DatePickerRange_Visualization', component_property = 'min_date_allowed'),
+    Output(component_id = 'EPVis_DatePickerRange_Visualization', component_property = 'max_date_allowed'),
+    Output(component_id = 'EPVis_DatePickerRange_UploadedFile', component_property = 'start_date'),
+    Output(component_id = 'EPVis_DatePickerRange_UploadedFile', component_property = 'end_date'),
+    Output(component_id = 'EPVis_DropDown_GeneratedDataTables', component_property = 'options'),
+    Output(component_id = 'EPVis_DropDown_AggregatedDataTables', component_property = 'options'),
+
+    State(component_id = 'EPVis_RadioButton_DataSource', component_property = 'value'),
     Input(component_id = 'EPVis_RadioButton_DataToBeSelected', component_property = 'value'),
     prevent_initial_call = True)
-def EPVis_Radio_DataToBeSelected_Interaction(selection):
+def EPVis_Radio_DataToBeSelected_Interaction(InputSelection, selection):
     if selection == 1: # Generate Data
         date_range1 = False
         date_range2 = False
@@ -3547,8 +3551,126 @@ def EPVis_Radio_DataToBeSelected_Interaction(selection):
         button_time_gen = True
         button_time_agg = True
         button_time_both = True
-    return date_range1, date_range2, var_gendata, var_aggrdata, button_dist_gen, button_dist_agg, button_dist_both, mean_gen, mean_agg, button_scat_gen, button_scat_agg, button_scat_both, button_time_gen, button_time_agg, button_time_both
+
+    # Creating Visualization FolderPath
+    Visualization_FolderPath = os.path.join(WORKSPACE_DIRECTORY, 'Visualization')
+
+    if os.path.isdir(Visualization_FolderPath):
+
+        z = 0
+
+    else:
+
+        os.mkdir(Visualization_FolderPath)
+
+    # Continue session -> copying files from previous session
+    if InputSelection == 1:
+
+        # For testing purposes
+        SIMULATION_FOLDERPATH = os.path.join(WORKSPACE_DIRECTORY, 'sim1')
+
+        # Copying generated file from previous session 
+        Sim_IDFProcessedData_FolderName = 'Sim_ProcessedData'
+        Sim_IDFProcessedData_FolderPath = os.path.join(SIMULATION_FOLDERPATH, "Final_run_folder", Sim_IDFProcessedData_FolderName)
+        shutil.copy(os.path.join(Sim_IDFProcessedData_FolderPath,'IDF_OutputVariables_DictDF.pickle'), os.path.join(Visualization_FolderPath,'Generated.pickle'))
+        
+        # Copying aggregated file from previous session
+        results_path = os.path.join(WORKSPACE_DIRECTORY, "Aggregation", "Results")
+        shutil.copy(os.path.join(results_path,'Aggregation_Dictionary.pickle'), os.path.join(Visualization_FolderPath,'Aggregated.pickle')) 
+
+    # Upload files -> copying uploaded files and renaming
+    elif InputSelection == 2:
+
+        for item in os.listdir(UPLOAD_DIRECTORY_VIS):
+            shutil.copy(os.path.join(UPLOAD_DIRECTORY_VIS,item), Visualization_FolderPath)
+
+
+
+    if selection == 1:
+        # Finding min and max dates from generated data
+        Generated_Dict_file = open(os.path.join(Visualization_FolderPath,'Generated.pickle'),"rb")
+        Generated_OutputVariable_Dict = pickle.load(Generated_Dict_file)
+        Generated_DateTime_List = Generated_OutputVariable_Dict['DateTime_List']
+        min_date_upload = min(Generated_DateTime_List)
+        max_date_upload = max(Generated_DateTime_List)
+
+        # Getting generated data variables
+        Generated_Variables = list(Generated_OutputVariable_Dict.keys())
+        Generated_Variables.remove('DateTime_List')
+
+        Aggregated_Variables = []
+
+    
+    elif selection == 2:
+        # Finding min and max dates from generated data
+        Aggregated_Dict_file = open(os.path.join(Visualization_FolderPath,'Aggregated.pickle'),"rb")
+        Aggregated_OutputVariable_Dict = pickle.load(Aggregated_Dict_file)
+        Aggregated_DateTime_List = Aggregated_OutputVariable_Dict['DateTime_List']
+        min_date_upload = min(Aggregated_DateTime_List)
+        max_date_upload = max(Aggregated_DateTime_List)
+
+        Generated_Variables = []
+
+        # Getting aggregated date variables
+        Aggregated_Variables = list(Aggregated_OutputVariable_Dict.keys())
+        Aggregated_Variables.remove('DateTime_List')
+    
+    elif selection == 3:
+        # Finding min and max dates from generated data
+        Generated_Dict_file = open(os.path.join(Visualization_FolderPath,'Generated.pickle'),"rb")
+        Generated_OutputVariable_Dict = pickle.load(Generated_Dict_file)
+        Generated_DateTime_List = Generated_OutputVariable_Dict['DateTime_List']
+        min_date_upload_gen = min(Generated_DateTime_List)
+        max_date_upload_gen = max(Generated_DateTime_List)
+
+        # Finding min and max dates from generated data
+        Aggregated_Dict_file = open(os.path.join(Visualization_FolderPath,'Aggregated.pickle'),"rb")
+        Aggregated_OutputVariable_Dict = pickle.load(Aggregated_Dict_file)
+        Aggregated_DateTime_List = Aggregated_OutputVariable_Dict['DateTime_List']
+        min_date_upload_agg = min(Aggregated_DateTime_List)
+        max_date_upload_agg = max(Aggregated_DateTime_List)
+
+        min_date_upload = max(min_date_upload_gen, min_date_upload_agg)
+        max_date_upload = min(max_date_upload_gen, max_date_upload_agg)
+
+        # Getting generated data variables
+        Generated_Variables = list(Generated_OutputVariable_Dict.keys())
+        Generated_Variables.remove('DateTime_List')
+
+        # Getting aggregated date variables
+        Aggregated_Variables = list(Aggregated_OutputVariable_Dict.keys())
+        Aggregated_Variables.remove('DateTime_List')
+
+    min_date_upload = min_date_upload.replace(hour = 0, minute = 0)
+    max_date_upload = max_date_upload.replace(hour = 0, minute = 0)
+
+    return date_range1, date_range2, var_gendata, var_aggrdata, button_dist_gen, button_dist_agg, button_dist_both, mean_gen, mean_agg, button_scat_gen, button_scat_agg, button_scat_both, button_time_gen, button_time_agg, button_time_both, min_date_upload, max_date_upload, min_date_upload, max_date_upload, min_date_upload, max_date_upload, Generated_Variables, Aggregated_Variables
+
+@app.callback(
+    Output(component_id = 'EPVis_DropDown_GeneratedDataColumns', component_property = 'options'),
+    Input(component_id = 'EPVis_DropDown_GeneratedDataTables', component_property = 'value'),
+    prevent_initial_call = True)
+def EPVis_DropDown_GeneratedDataTables_Interaction(variable):
+    columns = []
+    if variable is not None:
+        Generated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Generated.pickle'),"rb")
+        Generated_OutputVariable_Dict = pickle.load(Generated_Dict_file)
+        columns = list(Generated_OutputVariable_Dict[variable].columns)
+        columns.remove('Date/Time')
+    return columns
+
+@app.callback(
+    Output(component_id = 'EPVis_DropDown_AggregatedDataColumns', component_property = 'options'),
+    Input(component_id = 'EPVis_DropDown_AggregatedDataTables', component_property = 'value'),
+    prevent_initial_call = True)
+def EPVis_DropDown_GeneratedDataTables_Interaction(variable):
+    columns = []
+    if variable is not None:
+        Aggregated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Aggregated.pickle'),"rb")
+        Aggregated_OutputVariable_Dict = pickle.load(Aggregated_Dict_file)
+        columns = list(Aggregated_OutputVariable_Dict[variable].columns)
+    return columns
 
 # Running the App
-if __name__ == '__main__': 
+if __name__ == '__main__':
     app.run_server(port=4050)
