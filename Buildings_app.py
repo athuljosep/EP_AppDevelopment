@@ -5,21 +5,20 @@ Created on Tue Jan 30 15:32:25 2024
 """
 
 # Importing Required Modules
-from dash import Dash, dcc, html, Input, Output, State, ctx, callback
-import dash_bootstrap_components as dbc
-import plotly.express as px
-import dash_daq as daq
-import os
-import base64
-from datetime import date
 import shutil
-import opyplus as op
+import os
 import re
-import numpy as np
-import pandas as pd
 import datetime
 import pickle
 import copy
+from datetime import date
+from dash import Dash, dcc, html, Input, Output, State
+import pandas as pd
+import numpy as np
+import opyplus as op
+import dash_daq as daq
+import plotly.express as px
+import dash_bootstrap_components as dbc
 
 # Importing User-Defined Modules
 import MyDashApp_Module as AppFuncs
@@ -218,15 +217,13 @@ app.layout = dbc.Container([
                             html.Label("Time Step:",
                                 className = 'text'),
                             daq.NumericInput(
-                                id = 'sim_TimeStep', 
-                                value = 5,
-                                style = {
-                                    'margin-left':'28%'
-                                    }),
+                                id='sim_TimeStep',
+                                value=5,
+                                style={'margin-left':'28%'}
+                            ),
                             ],direction = "horizontal",
-                            style = {
-                                'margin': '5%',
-                                }),
+                            style = {'margin': '5%'}
+                        ),
 
                         # Simulation run period
                         html.Label("Simulation Run Period:",
@@ -252,7 +249,8 @@ app.layout = dbc.Container([
                         dbc.Stack([
                             html.Label("Simulation Reporting Frequency:",
                                 className = 'text'),
-                            dcc.Dropdown(['timestep','hourly','detailed','daily','monthly','runperiod','environment','annual'], '',
+                            dcc.Dropdown(['timestep','hourly','detailed','daily','monthly','runperiod','environment','annual'],
+                                '',
                                 id = 'simReportFreq_selection',
                                 style = {
                                     'width':'70%',
@@ -281,7 +279,7 @@ app.layout = dbc.Container([
                     # Box 2 C2
                     html.Div([
                         html.Button('Generate Variables',
-                            id = 'EPGen_Button_GenerateVariables', 
+                            id = 'EPGen_Button_GenerateVariables',
                             className = "btn btn-secondary btn-lg col-12",
                             n_clicks = 0,
                             style = {
@@ -751,7 +749,7 @@ app.layout = dbc.Container([
                             value = '',
                             className = 'ps-4 p-3',
                         ),
-                        
+
                         html.Label("Input Custom Aggregation Zone List (No spaces, only \",\" and \";\" for seperators)",
                             className = 'text-left ms-4 mt-1'),
                         dcc.Textarea(
@@ -821,7 +819,7 @@ app.layout = dbc.Container([
                 ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6,),
 
                 html.Button('End Session',
-                    id = 'Button_es_aggregation', 
+                    id = 'Button_es_aggregation',
                     className = "btn btn-primary btn-lg col-12",
                     style = {
                         'width':'98%',
@@ -901,15 +899,7 @@ app.layout = dbc.Container([
                 ], justify = "center", align = "center"),
 
             # Break Row
-            dbc.Row([
-
-                dbc.Col([
-
-                    html.Br()
-
-                    ], width = 12),
-
-                ]),
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
 
             # Row 5, upload files
                 html.Div([
@@ -931,15 +921,7 @@ app.layout = dbc.Container([
                     ),
 
                     # Break Row
-                    dbc.Row([
-
-                        dbc.Col([
-
-                            html.Br()
-
-                            ], width = 12),
-
-                        ]),
+                    dbc.Row([dbc.Col([html.Br()], width = 12),]),
 
                     # Upload Aggregated data
                     dcc.Upload(
@@ -967,15 +949,7 @@ app.layout = dbc.Container([
                         }),
 
             # Break Row
-            dbc.Row([
-
-                dbc.Col([
-
-                    html.Br()
-
-                    ], width = 12),
-
-                ]),
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
 
             # Row 7
             dbc.Row([
@@ -1006,15 +980,7 @@ app.layout = dbc.Container([
                 ], justify = "left", align = "center"),
 
             # Break Row
-            dbc.Row([
-
-                dbc.Col([
-
-                    html.Br()
-
-                    ], width = 12),
-
-                ]),
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
 
             dbc.Row([
 
@@ -1042,41 +1008,25 @@ app.layout = dbc.Container([
                 ], justify = "left", align = "center"),
 
             # Break Row
-            dbc.Row([
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
 
-                dbc.Col([
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
 
-                    html.Br()
-
-                    ], width = 12),
-
-                ]),
-
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),               
-            
             # Row 12
             dbc.Row([
-                
+
                 dbc.Col([
-                    
+
                     html.H3("Select Variable:",
                             className = 'text-left text-secondary mb-2'),
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
-                
-                ], justify = "left", align = "center"), 
-        
+
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+
+                ], justify = "left", align = "center"),
+
             # Row 13
             dbc.Row([
-                
+
                 dbc.Col([
 
                     html.Div([
@@ -1109,7 +1059,7 @@ app.layout = dbc.Container([
                                 'borderStyle': 'solid',
                                 'borderRadius': '5px',
                                 }),
-                    
+
                     ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6), # width = 12
 
                 dbc.Col([
@@ -1144,55 +1094,39 @@ app.layout = dbc.Container([
                                 'borderStyle': 'solid',
                                 'borderRadius': '5px',
                                 }),
-                    
+
                     ], xs = 12, sm = 12, md = 6, lg = 6, xl = 6), # width = 12
-                
+
                 ], justify = "center", align = "center"),
-            
+
             # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),
-            
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
+
 
             dbc.Row(
                 dbc.Col(
                     html.H3("Distribution Plot:", className = 'text-left text-secondary mb-2'),
                     width = 12
-                ), # width = 12      
+                ), # width = 12
                 justify = "left",
                 align = "center"
             ),
 
             # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
 
             # Row 14
             dbc.Row([
-                
+
                 dbc.Col([
-                    
+
                     html.Button(
                         'Generated Data',
                         id = 'EPVis_Button_DistGeneratedData',
-                        hidden = True, 
+                        hidden = True,
                         className = "btn btn-primary btn-lg col-12"
                     ),
-                    
+
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
 
                 dbc.Col([
@@ -1200,55 +1134,39 @@ app.layout = dbc.Container([
                     html.Button(
                         'Aggregated Data',
                         id = 'EPVis_Button_DistAggregatedData',
-                        hidden = True, 
+                        hidden = True,
                         className = "btn btn-primary btn-lg col-12"
                     ),
-                    
+
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
 
                 dbc.Col([
-                    
+
                     html.Button('Both',
                                 id = 'EPVis_Button_DistBothData',
-                                hidden = True, 
+                                hidden = True,
                                 className = "btn btn-primary btn-lg col-12"),
-                    
+
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
-                
-                ], justify = "center", align = "center"),   
+
+                ], justify = "center", align = "center"),
 
             # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                ], width = 12),
-                
-            ]), 
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
 
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                ], width = 12),
-                
-            ]),       
-            
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
+
             # Row 15
             dbc.Row([
-                
+
                 dbc.Col([
-                    
-                    dcc.Graph(id = 'Graph1', figure ={}),
-                    
+
+                    dcc.Graph(id = 'EPVis_Graph_Distribution', figure ={}),
+
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
-                
+
             ], justify = "center", align = "center"),
-                
+
             dbc.Row([
                 dbc.Col([
                     html.Br()
@@ -1269,16 +1187,16 @@ app.layout = dbc.Container([
                     'borderWidth': '1px',
                     'borderStyle': 'solid',
                     'borderRadius': '5px',
-                    },), 
+                    },),
 
             dbc.Row([
                 dbc.Col([
                     html.Br()
                 ], width = 12),
-                
+
             ]),
 
-            html.Div([ 
+            html.Div([
                 dbc.Row([
                     dbc.Col([html.H4('Aggregated Data')], width = 2),
                     dbc.Col([html.H4('Mean:')], width = 2),
@@ -1292,63 +1210,39 @@ app.layout = dbc.Container([
                     'borderWidth': '1px',
                     'borderStyle': 'solid',
                     'borderRadius': '5px',
-                    },),  
-            
+                    },),
+
             # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]), 
-                
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
+
             # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
 
             # Row 11
             dbc.Row([
-                
+
                 dbc.Col([
-                    
+
                     html.H3("Scatter Plot:",
                             className = 'text-left text-secondary mb-2')
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
-                
-                ], justify = "left", align = "center"), 
-            
+
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+
+                ], justify = "left", align = "center"),
+
             # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]), 
-            
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
+
             # Row 14
             dbc.Row([
-                
+
                 dbc.Col([
-                    
+
                     html.Button('Generated Data',
                                 id = 'EPVis_Button_ScatterGeneratedData',
                                 hidden = True,
                                 className = "btn btn-primary btn-lg col-12"),
-                    
+
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
 
                 dbc.Col([
@@ -1357,159 +1251,118 @@ app.layout = dbc.Container([
                                 id = 'EPVis_Button_ScatterAggregatedData',
                                 hidden = True,
                                 className = "btn btn-primary btn-lg col-12"),
-                    
+
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
 
                 dbc.Col([
-                    
+
                     html.Button('Both',
                                 id = 'EPVis_Button_ScatterBothData',
-                                hidden = True, 
-                                className = "btn btn-primary btn-lg col-12"),
-                    
-                    ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
-                
-                ], justify = "center", align = "center"),   
-
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),       
-            
-            # Row 15
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    dcc.Graph(id = 'Graph2', figure ={}),
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
-                
-                ], justify = "center", align = "center"), 
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]), 
-                
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),  
-            
-            # Row 16
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.H3("Time Series Plot:",
-                            className = 'text-left text-secondary mb-2')
-                    
-                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12      
-                
-                ], justify = "left", align = "center"),  
-            
-            # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),  
-            
-            # Row 14
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Button('Generated Data',
-                                id = 'EPVis_Button_TimeGeneratedData', 
                                 hidden = True,
                                 className = "btn btn-primary btn-lg col-12"),
-                    
+
+                    ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
+
+                ], justify = "center", align = "center"),
+
+            # Break Row
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
+
+            # Row 15
+            dbc.Row([
+
+                dbc.Col([
+
+                    dcc.Graph(id = 'Graph2', figure ={}),
+
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+
+                ], justify = "center", align = "center"),
+
+            # Break Row
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
+
+            # Break Row
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
+
+            # Row 16
+            dbc.Row([
+
+                dbc.Col([
+
+                    html.H3("Time Series Plot:",
+                            className = 'text-left text-secondary mb-2')
+
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+
+                ], justify = "left", align = "center"),
+
+            # Break Row
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
+
+            # Row 14
+            dbc.Row([
+
+                dbc.Col([
+
+                    html.Button('Generated Data',
+                                id = 'EPVis_Button_TimeGeneratedData',
+                                hidden = True,
+                                className = "btn btn-primary btn-lg col-12"),
+
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
 
                 dbc.Col([
 
                     html.Button('Aggregated Data',
-                                id = 'EPVis_Button_TimeAggregatedData', 
+                                id = 'EPVis_Button_TimeAggregatedData',
                                 hidden = True,
                                 className = "btn btn-primary btn-lg col-12"),
-                    
+
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
 
                 dbc.Col([
-                    
+
                     html.Button('Both',
-                                id = 'EPVis_Button_TimeBothData', 
+                                id = 'EPVis_Button_TimeBothData',
                                 hidden = True,
                                 className = "btn btn-primary btn-lg col-12"),
-                    
+
                     ], xs = 12, sm = 12, md = 4, lg = 4, xl = 4), # width = 12
-                
-                ], justify = "center", align = "center"),   
+
+                ], justify = "center", align = "center"),
 
             # Break Row
-            dbc.Row([
-                
-                dbc.Col([
-                    
-                    html.Br()
-                    
-                    ], width = 12),
-                
-                ]),       
-            
+            dbc.Row([dbc.Col([html.Br()], width = 12),]),
+
             # Row 15
             dbc.Row([
-                
+
                 dbc.Col([
-                    
+
                     dcc.Graph(id = 'Graph3', figure ={}),
-                    
+
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
-                
-                ], justify = "center", align = "center"), 
-            
+
+                ], justify = "center", align = "center"),
+
             # Break Row
             dbc.Row([
-                
+
                 dbc.Col([
-                    
+
                     html.Br(),
                     html.Button('End Session',
-                    id = 'Button_es_visualization', 
+                    id = 'Button_es_visualization',
                     className = "btn btn-primary btn-lg col-12",
                     ),
-                    
-                    ], width = 12),
-                
-                ]), 
 
-            
-            ]) 
-        
+                    ], width = 12),
+
+                ]),
+
+            ])
+
     ])
 
 ], fluid = False)
@@ -1557,7 +1410,7 @@ def EPGen_Radiobutton_DatabaseSelection_Interaction(folder_name, database_select
         download_variables = True
         final_download = True
 
-    if folder_name == None:
+    if folder_name is None:
         z = 0
     else:
         SIMULATION_FOLDERNAME = folder_name
@@ -1580,7 +1433,7 @@ def EPGen_Upload_IDF_Interaction(filename, content):
     if filename is not None and content is not None:
         AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY)
         message = 'File Uploaded'
-    
+
     else:
         message = 'Upload IDF file'
 
@@ -1595,7 +1448,7 @@ def EPGen_Upload_EPW_Interaction(filename, content):
     if filename is not None and content is not None:
         AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY)
         message = 'File Uploaded'
-    
+
     else:
         message = 'Upload EPW file'
 
@@ -1617,7 +1470,7 @@ def EPGen_Dropdown_EPVersion_Interaction(version_selection):
     Input(component_id = 'location_selection', component_property = 'value'),
     prevent_initial_call = True)
 def EPGen_Dropdown_Location_Interaction(location_selection):
-    if location_selection == None :
+    if location_selection is None :
         simulation_details = True
     else:
         simulation_details = False
@@ -1691,7 +1544,7 @@ def EPGen_RadioButton_EditSchedule_Interaction(EPGen_Radiobutton_VariableSelecti
                 Current_ThermostatSetpoint_dict = ThermostatSetpoint_List[counter]._records
 
                 for Current_key in Current_ThermostatSetpoint_dict:
-                    Current_ThermostatSetpoint_element = Current_ThermostatSetpoint_dict[Current_key] 
+                    Current_ThermostatSetpoint_element = Current_ThermostatSetpoint_dict[Current_key]
 
                     for attr in ThermostatSetpoint_attribute_nameList:
                         try:
@@ -1709,7 +1562,7 @@ def EPGen_RadioButton_EditSchedule_Interaction(EPGen_Radiobutton_VariableSelecti
 
                             if attr == 'setpoint_temperature_schedule_name':
                                 TemperatureSetpoint_List.append(Current_ThermostatSetpoint_element_value.name)
-                
+
         HeatingSetpoint_Schedules = list(set(HeatingSetpoint_List))
         CoolingSetpoint_Schedules = list(set(CoolingSetpoint_List))
         TemperatureSetpoint_Schedules = list(set(TemperatureSetpoint_List))
@@ -1729,7 +1582,7 @@ def EPGen_RadioButton_EditSchedule_Interaction(EPGen_Radiobutton_VariableSelecti
         HeatingSetpoint_Schedules = []
         CoolingSetpoint_Schedules = []
         TemperatureSetpoint_Schedules = []
-    
+
     edited_idf_folder_path = os.path.join(SIMULATION_FOLDERPATH,'Edited_idf_folder')
 
     if os.path.isdir(edited_idf_folder_path):
@@ -1739,7 +1592,7 @@ def EPGen_RadioButton_EditSchedule_Interaction(EPGen_Radiobutton_VariableSelecti
         for item in os.listdir(initial_run_folder_path):
             if (item.endswith(".idf") or item.endswith(".epw")) and (not item.startswith("opyplus")):
                 shutil.copy(os.path.join(initial_run_folder_path,item), edited_idf_folder_path)
-                     
+
     #Current_IDFFile.ThermostatSetpoint_DualSetpoint._records['core_zn dualspsched'].heating_setpoint_temperature_schedule_name.name
 
     return schedules, People_Schedules, Equip_Schedules, Light_Schedules, HeatingSetpoint_Schedules, CoolingSetpoint_Schedules, TemperatureSetpoint_Schedules
@@ -1772,13 +1625,13 @@ def EPGen_Dropdown_BuildingType_Interaction(buildingType_selection):
     # Listing next sub level of folders
     if buildingType_selection is not None:
         FilePath = os.path.join(os.getcwd(), "../../Data/", buildingType_selection)
-        level_1_list = AppFuncs.list_contents(FilePath)        
+        level_1_list = AppFuncs.list_contents(FilePath)
         level_2_list = []
         level_3_list = []
 
         if buildingType_selection == 'Commercial_Prototypes':
             Weather_FilePath = os.path.join(DATA_DIRECTORY, "TMY3_WeatherFiles_Commercial")
-            Weather_list = AppFuncs.list_contents(Weather_FilePath) 
+            Weather_list = AppFuncs.list_contents(Weather_FilePath)
         elif buildingType_selection == 'Manufactured_Prototypes':
             Weather_FilePath = os.path.join(DATA_DIRECTORY, "TMY3_WeatherFiles_Manufactured")
             Weather_list = AppFuncs.list_contents(Weather_FilePath)
@@ -1833,13 +1686,13 @@ def EPGen_Dropdown_SubLevel1_Interaction(buildingType_selection, level_1):
     State(component_id = 'level_1', component_property = 'value'),
     Input(component_id = 'level_2', component_property = 'value'),
     prevent_initial_call = True)
-def EPGen_Dropdown_SubLevel2_Interaction(buildingType_selection, level_1, level_2):     
+def EPGen_Dropdown_SubLevel2_Interaction(buildingType_selection, level_1, level_2):
     # Listing next sub level of folders
     if level_2 is not None:
         FilePath = os.path.join(os.getcwd(), "../../Data/", buildingType_selection, level_1, level_2)
         level_3_list = AppFuncs.list_contents(FilePath)
         level_3_list = [file for file in level_3_list if file.endswith('.idf')]
-    
+
     else:
         level_3_list = []
 
@@ -1860,7 +1713,7 @@ def EPGen_Dropdown_SubLevel2_Interaction(buildingType_selection, level_1, level_
     Input(component_id = 'EPGen_Button_GenerateVariables', component_property = 'n_clicks'),
     prevent_initial_call = True)
 def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_selection, level_1, level_2, level_3, location_selection, n_clicks):
- 
+
     # Creating idf_weather_folder
     idf_weather_folder_path = os.path.join(SIMULATION_FOLDERPATH, "idf_weather_folder")
     if os.path.isdir(idf_weather_folder_path):
@@ -1877,9 +1730,9 @@ def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_
         elif buildingType_selection == 'Manufactured_Prototypes':
             Weather_original_path = os.path.join(DATA_DIRECTORY, "TMY3_WeatherFiles_Manufactured", location_selection)
         elif buildingType_selection == 'Residential_Prototypes':
-            Weather_original_path = os.path.join(DATA_DIRECTORY, "TMY3_WeatherFiles_Residential", location_selection)        
+            Weather_original_path = os.path.join(DATA_DIRECTORY, "TMY3_WeatherFiles_Residential", location_selection)
         shutil.copy(Weather_original_path, idf_weather_folder_path)
-    
+
     elif database_selection == 2:
         for item in os.listdir(UPLOAD_DIRECTORY):
             if os.path.isfile(os.path.join(UPLOAD_DIRECTORY,item)):
@@ -1920,8 +1773,8 @@ def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_
     # Collecting Simulation Variable List
     with open(os.path.join(initial_run_folder_path, 'eplusout.rdd')) as f:
         lines = f.readlines()
-        
-    Simulation_VariableNames = []  
+
+    Simulation_VariableNames = []
 
     Counter_Lines = 0
 
@@ -1962,7 +1815,7 @@ def EPGen_Button_GenerateVariables_Interaction(database_selection, buildingType_
     Input(component_id = 'temperature_schedules', component_property = 'value'),
     prevent_initial_call = True)
 def EPGen_Dropdown_EditSchedule_Interaction(people_schedules, equip_schedules, light_schedules, heating_schedules, cooling_schedules, temperature_schedules):
-    if (not (people_schedules == None)) or (not (equip_schedules == None)) or (not (light_schedules == None)) or (not (heating_schedules == None)) or (not (cooling_schedules == None)) or (not (temperature_schedules == None)):
+    if (not (people_schedules is None)) or (not (equip_schedules is None)) or (not (light_schedules is None)) or (not (heating_schedules is None)) or (not (cooling_schedules is None)) or (not (temperature_schedules is None)):
         update_selected_schedule = "Update selected schedule"
     else:
         update_selected_schedule = "Select single schedule"
@@ -1980,19 +1833,19 @@ def EPGen_Dropdown_EditSchedule_Interaction(people_schedules, equip_schedules, l
     Input(component_id = 'update_selected_schedule', component_property = 'n_clicks'),
     prevent_initial_call = True)
 def EPGen_Button_UpdateSelectedSchedule_Interaction(people_schedules, equip_schedules, light_schedules, heating_schedules, cooling_schedules, temperature_schedules, schedule_input, n_clicks):
-    
+
     schedule_list = [people_schedules, equip_schedules, light_schedules, heating_schedules, cooling_schedules, temperature_schedules]
-    
+
     edited_idf_folder_path = os.path.join(SIMULATION_FOLDERPATH,'Edited_idf_folder')
-    
+
     count_none = 0
-   
+
     for schedule in schedule_list:
-        if schedule == None:
+        if schedule is None:
             count_none = count_none + 1
         else:
             desired_schedule = schedule
-    
+
     if count_none != 5:
         update_selected_schedule = "Please select one"
     else:
@@ -2007,7 +1860,7 @@ def EPGen_Button_UpdateSelectedSchedule_Interaction(people_schedules, equip_sche
 
         # Step 2 Get table from compact schedule which corresponds to desired schedule
         Current_Schedule_1 = Edited_ScheduleCompact.one(lambda x: x.name == desired_schedule.lower())
-       
+
         # Step 3 change the name to something xyz@123 add user defined schedule
         Current_Schedule_1.name = 'xyz'
 
@@ -2021,7 +1874,7 @@ def EPGen_Button_UpdateSelectedSchedule_Interaction(people_schedules, equip_sche
             Current_line_elements = line1.split('!-')
             Current_value = Current_line_elements[0].strip()
             Current_key = Current_line_elements[1].lower().strip().replace(' ', '_')
-            
+
             if Current_value[-1] == ',':
                 Current_value = Current_value[:-1]
 
@@ -2047,8 +1900,8 @@ def EPGen_Button_UpdateSelectedSchedule_Interaction(people_schedules, equip_sche
                 if not (line_k.find('Schedule:Compact') >= 0):
 
                     if line_k_plus_1.find('xyz') >= 0:
-                        
-                        lines[ii] = line_k_plus_1.replace('xyz', desired_schedule.lower())        
+
+                        lines[ii] = line_k_plus_1.replace('xyz', desired_schedule.lower())
 
         # Step 6 OverWrite the file again
         with open(IDF_FilePath, 'w') as file:
@@ -2056,7 +1909,7 @@ def EPGen_Button_UpdateSelectedSchedule_Interaction(people_schedules, equip_sche
             for line in lines:
                 file.write(line)
 
-        # Step 7 update update_selected_schedule 
+        # Step 7 update update_selected_schedule
         update_selected_schedule = "Schedule updated"
 
     return update_selected_schedule
@@ -2066,7 +1919,7 @@ def EPGen_Button_UpdateSelectedSchedule_Interaction(people_schedules, equip_sche
     Input(component_id = 'EPGen_Radiobutton_EditSchedules', component_property = 'value'),
     prevent_initial_call = True)
 def EPGen_RadioButton_EditSchedules_Interaction_2(EPGen_Radiobutton_VariableSelection):
-    
+
     if EPGen_Radiobutton_VariableSelection == 2:
 
         download_variables = False
@@ -2079,9 +1932,9 @@ def EPGen_RadioButton_EditSchedules_Interaction_2(EPGen_Radiobutton_VariableSele
     Input(component_id = 'done_updating_schedule', component_property = 'n_clicks'),
     prevent_initial_call = True)
 def EPGen_Button_DoneUpdatingSchedule_Interaction(n_clicks):
-    
+
     download_variables = False
-    
+
     return download_variables
 
 @app.callback(
@@ -2089,11 +1942,11 @@ def EPGen_Button_DoneUpdatingSchedule_Interaction(n_clicks):
     Input(component_id = 'download_selection', component_property = 'value'),
     prevent_initial_call = True)
 def EPGen_Checkbox_DownloadSelection_Interaction(download_selection):
-    
+
     if download_selection != '':
-        
+
         final_download = False
-    
+
     return final_download
 
 @app.callback(
@@ -2108,7 +1961,7 @@ def EPGen_Checkbox_DownloadSelection_Interaction(download_selection):
     Input(component_id = 'EPGen_Button_GenerateData', component_property = 'n_clicks'),
     prevent_initial_call = True)
 def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_date, Sim_TimeStep, Sim_OutputVariable_ReportingFrequency, Var_selection, your_vars, n_clicks):
-    
+
     edited_idf_folder_path = os.path.join(SIMULATION_FOLDERPATH,"Edited_idf_folder")
 
     # Creating final run folder and copying files to the path
@@ -2117,7 +1970,7 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
     if os.path.isdir(final_run_folder_path):
         z = 0
     else:
-        os.mkdir(final_run_folder_path)    
+        os.mkdir(final_run_folder_path)
 
         for item in os.listdir(edited_idf_folder_path):
             shutil.copy(os.path.join(edited_idf_folder_path,item), final_run_folder_path)
@@ -2129,7 +1982,7 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
 
         if file.endswith(".epw"):
             Final_Weather_FilePath = os.path.join(final_run_folder_path, file)
-    
+
     # Loading IDF File
     Current_IDFFile = op.Epm.load(Final_IDF_FilePath)
 
@@ -2165,15 +2018,15 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
 
     # Checking if Folders Exist if not create Folders
     if (os.path.isdir(Sim_IDFWeatherFiles_FolderPath)):
- 
+
         z = None
-        
+
     else:
-        
+
         os.mkdir(Sim_IDFWeatherFiles_FolderPath)
-        
+
         os.mkdir(Sim_OutputFiles_FolderPath)
-        
+
         os.mkdir(Sim_IDFProcessedData_FolderPath)
 
     # Overwriting Edited IDF
@@ -2235,7 +2088,7 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
 
         # =============================================================================
         # Convert and Save Output Variables .csv to.mat in Results Folder
-        # =============================================================================    
+        # =============================================================================
 
         # Getting all .csv Files paths from Sim_IDFProcessedData_FolderPath
         FileName_List = os.listdir(Sim_IDFProcessedData_FolderPath)
@@ -2245,10 +2098,10 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
 
         # FOR LOOP: For each file in Sim_IDFProcessedData_FolderPath
         for file in FileName_List:
-            
-            # Check only .csv files 
+
+            # Check only .csv files
             if file.endswith('.csv'):
-                
+
                 # Appending .csv file paths to CSV_FilePath_List
                 CSV_FilePath_List.append(os.path.join(Sim_IDFProcessedData_FolderPath,file))
 
@@ -2261,32 +2114,32 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
 
         # FOR LOOP: For Each .csv File in CSV_FilePath_List
         for file_path in CSV_FilePath_List:
-            
+
             # Reading .csv file in dataframe
             Current_DF = pd.read_csv(file_path)
 
             # Getting CurrentDF_1
             if (Counter_OutputVariable == 0):
-                
+
                 # Keeping DateTime Column
                 Current_DF_1 = Current_DF
-                
+
             else:
-                
+
                 # Dropping DateTime Column
                 Current_DF_1=Current_DF.drop(Current_DF.columns[[0]],axis=1)
-            
+
             # Appending Column Names to IDF_OutputVariable_ColumnName_List
             for ColumnName in Current_DF_1.columns:
-                
+
                 IDF_OutputVariable_ColumnName_List.append(ColumnName)
-                
+
             # Getting File Name
             FileName = file_path.split('\\')[-1].split('_.')[0]
-            
+
             # Storing Current_DF in IDF_OutputVariable_Dict
             IDF_OutputVariable_Dict[FileName] = Current_DF
-            
+
             # Incrementing Counter_OutputVariable
             Counter_OutputVariable = Counter_OutputVariable + 1
 
@@ -2296,17 +2149,17 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
         DateTime_Column = Current_DF['Date/Time']
 
         for DateTime in DateTime_Column:
-            
+
             DateTime_Split = DateTime.split(' ')
-            
+
             Date_Split = DateTime_Split[1].split('/')
-            
+
             Time_Split = DateTime_Split[3].split(':')
 
             # Converting all 24th hour to 0th hour as hour must be in 0..23
             if int(Time_Split[0]) == 24:
                 Time_Split[0] = 00
-            
+
             DateTime_List.append(datetime.datetime(int(IDF_FileYear),int(Date_Split[0]),int(Date_Split[1]),int(Time_Split[0]),int(Time_Split[1]),int(Time_Split[2])))
 
         IDF_OutputVariable_Dict['DateTime_List'] = DateTime_List
@@ -2317,13 +2170,13 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
 
         # =============================================================================
         # Process .eio Output File and save in Results Folder
-        # =============================================================================  
-        # 
+        # =============================================================================
+        #
         # Running Building Simulation to obtain current output variable
-        op.simulate(Results_IDF_FilePath, Results_Weather_FilePath, base_dir_path = Sim_OutputFiles_FolderPath)  
+        op.simulate(Results_IDF_FilePath, Results_Weather_FilePath, base_dir_path = Sim_OutputFiles_FolderPath)
 
         # Reading .eio Output File
-        Eio_OutputFile_Path = os.path.join(Sim_OutputFiles_FolderPath,'eplusout.eio') 
+        Eio_OutputFile_Path = os.path.join(Sim_OutputFiles_FolderPath,'eplusout.eio')
 
         # Initializing Eio_OutputFile_Dict
         Eio_OutputFile_Dict = {}
@@ -2417,7 +2270,7 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
             else:
 
                 continue
-            
+
         # Saving Eio_OutputFile_Dict as a .pickle File in Results Folder
         pickle.dump(Eio_OutputFile_Dict, open(os.path.join(Sim_IDFProcessedData_FolderPath,"Eio_OutputFile.pickle"), "wb"))
 
@@ -2459,11 +2312,21 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
 
             MoveTo_CSV_FilePath = os.path.join(Sim_IDFProcessedData_FolderPath, New_OutputVariable_FileName)
 
-            shutil.move(Current_CSV_FilePath, MoveTo_CSV_FilePath)
+            try:
+
+                shutil.move(Current_CSV_FilePath, MoveTo_CSV_FilePath)
+
+            except:
+
+                print("An exception occured")
+
+            else:
+
+                continue
 
         # =============================================================================
         # Convert and Save Output Variables .csv to.mat in Results Folder
-        # =============================================================================    
+        # =============================================================================
 
         # Getting all .csv Files paths from Sim_IDFProcessedData_FolderPath
         FileName_List = os.listdir(Sim_IDFProcessedData_FolderPath)
@@ -2473,10 +2336,10 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
 
         # FOR LOOP: For each file in Sim_IDFProcessedData_FolderPath
         for file in FileName_List:
-            
-            # Check only .csv files 
+
+            # Check only .csv files
             if file.endswith('.csv'):
-                
+
                 # Appending .csv file paths to CSV_FilePath_List
                 CSV_FilePath_List.append(os.path.join(Sim_IDFProcessedData_FolderPath,file))
 
@@ -2489,32 +2352,32 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
 
         # FOR LOOP: For Each .csv File in CSV_FilePath_List
         for file_path in CSV_FilePath_List:
-            
+
             # Reading .csv file in dataframe
             Current_DF = pd.read_csv(file_path)
 
             # Getting CurrentDF_1
             if (Counter_OutputVariable == 0):
-                
+
                 # Keeping DateTime Column
                 Current_DF_1 = Current_DF
-                
+
             else:
-                
+
                 # Dropping DateTime Column
                 Current_DF_1=Current_DF.drop(Current_DF.columns[[0]],axis=1)
-            
+
             # Appending Column Names to IDF_OutputVariable_ColumnName_List
             for ColumnName in Current_DF_1.columns:
-                
+
                 IDF_OutputVariable_ColumnName_List.append(ColumnName)
-                
+
             # Getting File Name
             FileName = file_path.split('\\')[-1].split('_.')[0]
-            
+
             # Storing Current_DF in IDF_OutputVariable_Dict
             IDF_OutputVariable_Dict[FileName] = Current_DF
-            
+
             # Incrementing Counter_OutputVariable
             Counter_OutputVariable = Counter_OutputVariable + 1
 
@@ -2524,17 +2387,17 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
         DateTime_Column = Current_DF['Date/Time']
 
         for DateTime in DateTime_Column:
-            
+
             DateTime_Split = DateTime.split(' ')
-            
+
             Date_Split = DateTime_Split[1].split('/')
-            
+
             Time_Split = DateTime_Split[3].split(':')
 
             # Converting all 24th hour to 0th hour as hour must be in 0..23
             if int(Time_Split[0]) == 24:
                 Time_Split[0] = 00
-            
+
             DateTime_List.append(datetime.datetime(int(IDF_FileYear),int(Date_Split[0]),int(Date_Split[1]),int(Time_Split[0]),int(Time_Split[1]),int(Time_Split[2])))
 
         IDF_OutputVariable_Dict['DateTime_List'] = DateTime_List
@@ -2543,10 +2406,10 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
 
         # =============================================================================
         # Process .eio Output File and save in Results Folder
-        # =============================================================================   
+        # =============================================================================
 
         # Reading .eio Output File
-        Eio_OutputFile_Path = os.path.join(Sim_OutputFiles_FolderPath,'eplusout.eio') 
+        Eio_OutputFile_Path = os.path.join(Sim_OutputFiles_FolderPath,'eplusout.eio')
 
         # Initializing Eio_OutputFile_Dict
         Eio_OutputFile_Dict = {}
@@ -2640,7 +2503,7 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
             else:
 
                 continue
-            
+
         # Saving Eio_OutputFile_Dict as a .pickle File in Results Folder
         pickle.dump(Eio_OutputFile_Dict, open(os.path.join(Sim_IDFProcessedData_FolderPath,"Eio_OutputFile.pickle"), "wb"))
 
@@ -2648,7 +2511,7 @@ def EPGen_Button_GenerateData_Interaction(download_selection, start_date, end_da
         AppFuncs.compress(pickle_list, Sim_IDFProcessedData_FolderPath)
 
     button_text = "Data Generated"
-    
+
     return button_text
 
 @app.callback(
@@ -2676,9 +2539,9 @@ def EPGen_Button_DownloadFiles_Interaction(download_selection, n_clicks):
     prevent_initial_call = True)
 def EPGen_Button_EndSession_Interaction(n_clicks):
 
-    for dir in os.listdir(WORKSPACE_DIRECTORY):
+    for directory in os.listdir(WORKSPACE_DIRECTORY):
 
-        shutil.rmtree(os.path.join(WORKSPACE_DIRECTORY, dir))
+        shutil.rmtree(os.path.join(WORKSPACE_DIRECTORY, directory))
 
     return "Session Completed"
 
@@ -2688,22 +2551,22 @@ def EPGen_Button_EndSession_Interaction(n_clicks):
     Input(component_id = 'EPAgg_RadioButton_InputSelection', component_property = 'value'),
     prevent_initial_call = True)
 def EPAgg_RadioButton_InputSelection_Interaction(value):
-    
+
     if value == 1:
-        
+
         upload_div = True
         variable_div = False
-    
+
     elif value == 2:
-        
+
         upload_div = False
         variable_div = False
-        
+
     else:
-        
+
         upload_div = True
         variable_div = True
-        
+
     return upload_div, variable_div
 
 @app.callback(
@@ -2715,7 +2578,7 @@ def EPAgg_Upload_Pickle_Interaction(filename, content):
     if filename is not None and content is not None:
         AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY_AGG_PICKLE)
         message = filename + ' uploaded successfully'
-    
+
     else:
         message = 'Upload Pickled Variable file'
 
@@ -2730,7 +2593,7 @@ def EPAgg_Upload_EIO_Interaction(filename, content):
     if filename is not None and content is not None:
         AppFuncs.save_file(filename, content, UPLOAD_DIRECTORY_AGG_EIO)
         message = filename + ' uploaded successfully'
-    
+
     else:
         message = 'Upload EIO file'
 
@@ -2742,11 +2605,11 @@ def EPAgg_Upload_EIO_Interaction(filename, content):
     Input(component_id = 'EPAgg_DropDown_CustomVariables', component_property = 'value'),
     prevent_initial_call = True)
 def EPAgg_DropDown_AggregationVariables_Interaction(selection, value):
-    
+
     if selection == 1:
-        
+
         div = False
-    
+
     elif selection == 2:
 
         div = True
@@ -2756,9 +2619,9 @@ def EPAgg_DropDown_AggregationVariables_Interaction(selection, value):
             div = False
 
     else:
-        
+
         div = True
-        
+
     return div
 
 @app.callback(
@@ -2787,7 +2650,7 @@ def EPAgg_RadioButton_AggregationVariables_Interaction(InputSelection, VariableS
         # For testing purposes
         SIMULATION_FOLDERPATH = os.path.join(WORKSPACE_DIRECTORY, 'sim1')
 
-        # Copying pickle file & eio file from previous session 
+        # Copying pickle file & eio file from previous session
         Sim_IDFProcessedData_FolderName = 'Sim_ProcessedData'
         Sim_IDFProcessedData_FolderPath = os.path.join(SIMULATION_FOLDERPATH, "Final_run_folder", Sim_IDFProcessedData_FolderName)
 
@@ -2851,15 +2714,15 @@ def EPAgg_RadioButton_AggregationVariables_Interaction(InputSelection, VariableS
     Input(component_id = 'EPAgg_DropDown_TypeOfAggregation', component_property = 'value'),
     prevent_initial_call = True)
 def EPAgg_DropDown_TypeOfAggregation_Interaction(value):
-    
+
     if value != None:
-        
+
         div = False
 
     else:
-        
+
         div = True
-        
+
     return div
 
 @app.callback(
@@ -2872,7 +2735,7 @@ def EPAgg_DropDown_TypeOfAggregation_Interaction(value):
     Input(component_id = 'EPAgg_Button_Aggregate', component_property = 'n_clicks'),
     prevent_initial_call = True)
 def EPAgg_Button_Aggregate_Interaction(variable_selection, custom_variables, aggregate_to, custom_zone_list, Type_Aggregation, n_clicks):
-    
+
     # Retrieing Aggregation Folder Path
     Aggregation_FolderPath = os.path.join(WORKSPACE_DIRECTORY, 'Aggregation')
 
@@ -2891,13 +2754,17 @@ def EPAgg_Button_Aggregate_Interaction(variable_selection, custom_variables, agg
         selected_variable_list = OUR_VARIABLE_LIST
 
     elif variable_selection == 2:  # Custom variables
-        
+
         selected_variable_list = custom_variables
 
     # Getting Aggregation Zone list
     if aggregate_to == 1:  # Aggregate to one
 
-        Aggregation_Zone_List = [list(Eio_OutputFile_Dict['Zone Information'][Eio_OutputFile_Dict['Zone Information']['  Part of Total Building Area']  == 'Yes']['Zone Name'])]
+        Aggregation_Zone_List_1 = list(Eio_OutputFile_Dict['Zone Information'][Eio_OutputFile_Dict['Zone Information']['  Part of Total Building Area']  == 'Yes']['Zone Name'])
+
+        Aggregation_Zone_List_2 = [x.strip(" ") for x in Aggregation_Zone_List_1]
+
+        Aggregation_Zone_List = [Aggregation_Zone_List_2]
 
     elif aggregate_to == 2:   # Custom Aggregation
 
@@ -2911,21 +2778,21 @@ def EPAgg_Button_Aggregate_Interaction(variable_selection, custom_variables, agg
 
             Aggregation_Zone_List.append(Current_Zone_List.split(','))
 
-    Aggregation_VariableNames_List = Aggregation_Zone_List
+    Aggregation_VariableNames_List = selected_variable_list
 
     Aggregation_Zone_NameStem = 'Aggregation_Zone'
 
     SystemNode_Name = 'DIRECT AIR INLET NODE'
 
     # Implementing Aggregation Code
-    
+
 
     # Getting DateTime_List
     DateTime_List = IDF_OutputVariable_Dict['DateTime_List']
 
 
     # =============================================================================
-    # Creating Unique Zone Name List and Associated Areas and Volume Dicts 
+    # Creating Unique Zone Name List and Associated Areas and Volume Dicts
     # =============================================================================
 
     # Creating Unique List of Zones
@@ -2933,13 +2800,13 @@ def EPAgg_Button_Aggregate_Interaction(variable_selection, custom_variables, agg
 
     # FOR LOOP: For each element of Aggregation_Zone_List
     for CurrentZone_List in Aggregation_Zone_List:
-        
+
         # FOR LOOP: For each element of CurrentZone_List
         for CurrentZone in CurrentZone_List:
-            
+
             # Appending CurrentZone to Total_Zone_List
             Total_Zone_List.append(CurrentZone)
-            
+
     # Creating Unique Zone List
     Unique_Zone_List = list(set(Total_Zone_List))
 
@@ -2953,67 +2820,67 @@ def EPAgg_Button_Aggregate_Interaction(variable_selection, custom_variables, agg
 
         # Initializing Unique_Zone_Area_Dict and Unique_Zone_Volume_Dict
         Unique_Zone_Area_Dict = {}
-        
+
         # Getiing Zone Area and Volumes from Eio_OutputFile_Dict
-        
+
         # FOR LOOP: For each element of Unique_Zone_List
         for Unique_Zone in Unique_Zone_List:
-            
+
             Unique_Zone_Area_Dict[Unique_Zone] = float(Eio_OutputFile_Dict['Zone Information'].query('`Zone Name` == Unique_Zone')['Floor Area {m2}'])
-        
+
         # Creating Zone_TotalArea_List
         Zone_TotalArea_List = []
-        
+
         # FOR LOOP: For each Element in Aggregation_Zone_List
         for Aggregation_Zone_List1 in Aggregation_Zone_List:
-            
+
             # Initializing TotalArea
             TotalArea = 0
-            
+
             # FOR LOOP: For each Element in Aggregation_Zone_List1
             for element in Aggregation_Zone_List1:
-                
+
                 # Summing Up Zone Area
                 TotalArea = TotalArea + Unique_Zone_Area_Dict[element]
-                
+
             # Appending Zone_TotalArea_List
             Zone_TotalArea_List.append(TotalArea)
-        
+
     elif (Type_Aggregation == 3): # Weighted Volume Aggregation
 
-        # Initializing Unique_Zone_Area_Dict and Unique_Zone_Volume_Dict    
+        # Initializing Unique_Zone_Area_Dict and Unique_Zone_Volume_Dict
         Unique_Zone_Volume_Dict = {}
-        
+
         # Getiing Zone Area and Volumes from Eio_OutputFile_Dict
-        
+
         # FOR LOOP: For each element of Unique_Zone_List
         for Unique_Zone in Unique_Zone_List:
-            
+
             Unique_Zone_Volume_Dict[Unique_Zone] = float(Eio_OutputFile_Dict['Zone Information'].query('`Zone Name` == Unique_Zone')['Volume {m3}'])
 
         # Creating Zone_TotalVolume_List
         Zone_TotalVolume_List = []
-        
+
         # FOR LOOP: For each Element in Aggregation_Zone_List
         for Aggregation_Zone_List1 in Aggregation_Zone_List:
-            
+
             # Initializing TotalArea
             TotalVolume = 0
-            
+
             # FOR LOOP: For each Element in Aggregation_Zone_List1
             for element in Aggregation_Zone_List1:
-                
+
                 # Summing Up Zone Area
                 TotalVolume = TotalVolume + Unique_Zone_Volume_Dict[element]
-                
+
             # Appending Zone_TotalArea_List
             Zone_TotalVolume_List.append(TotalVolume)
-            
-            
+
+
     # =============================================================================
     # Creating Aggregation_DF with relevant Columns to hold Aggregated Data
     # =============================================================================
-        
+
     # Creating Equipment List
     Equipment_List = ['People', 'Lights', 'ElectricEquipment', 'GasEquipment', 'OtherEquipment', 'HotWaterEquipment', 'SteamEquipment']
 
@@ -3022,53 +2889,53 @@ def EPAgg_Button_Aggregate_Interaction(variable_selection, custom_variables, agg
 
     # FOR LOOP: For each Variable Name in Aggregation_VariableNames_List
     for key in Aggregation_VariableNames_List:
-        
+
         # IF LOOP: For the Variable Name Schedule_Value_
         if (key == 'Schedule_Value_'): # Create Schedule Columns which are needed
-        
+
             # FOR LOOP: For each element in Equipment_List
             for element in Equipment_List:
-                
+
                 # Creating Current_EIO_Dict_Key
                 Current_EIO_Dict_Key = element + ' ' + 'Internal Gains Nominal'
-                
+
                 # IF LOOP: To check if Current_EIO_Dict_Key is present in Eio_OutputFile_Dict
-                if (Current_EIO_Dict_Key in Eio_OutputFile_Dict): # Key present in Eio_OutputFile_Dict            
-                
+                if (Current_EIO_Dict_Key in Eio_OutputFile_Dict): # Key present in Eio_OutputFile_Dict
+
                     # Creating key1 for column Name
                     key1 = key + element
-                
+
                     # Initializing Aggregation_Dict with None
-                    Aggregation_DF[key1] = None    
-        
+                    Aggregation_DF[key1] = None
+
         else: # For all other Columns
-        
+
             # Initializing Aggregation_Dict with None
             Aggregation_DF[key] = None
 
     # Initializing Aggregation_DF_Equipment
-    Aggregation_DF_Equipment = pd.DataFrame()        
-            
+    Aggregation_DF_Equipment = pd.DataFrame()
+
     # FOR LOOP: For each element in Equipment_List
     for element in Equipment_List:
-        
+
         # Creating Current_EIO_Dict_Key
         Current_EIO_Dict_Key = element + ' ' + 'Internal Gains Nominal'
-        
+
         # IF LOOP: To check if Current_EIO_Dict_Key is present in Eio_OutputFile_Dict
-        if (Current_EIO_Dict_Key in Eio_OutputFile_Dict): # Key present in Eio_OutputFile_Dict            
-        
+        if (Current_EIO_Dict_Key in Eio_OutputFile_Dict): # Key present in Eio_OutputFile_Dict
+
             # Creating key1 for column Name
             key1 =  element + '_Level'
-        
+
             # Initializing Aggregation_Dict with None
-            Aggregation_DF_Equipment[key1] = None  
-            
+            Aggregation_DF_Equipment[key1] = None
+
 
     # =============================================================================
-    # Creating Aggregation_Dict to hold Aggregated Data 
+    # Creating Aggregation_Dict to hold Aggregated Data
     # =============================================================================
-            
+
     # Initializing Aggregation_Dict
     Aggregation_Dict = {'DateTime_List': DateTime_List}
 
@@ -3077,55 +2944,55 @@ def EPAgg_Button_Aggregate_Interaction(variable_selection, custom_variables, agg
 
     # FOR LOOP: For each element in Aggregation_Zone_List
     for element in Aggregation_Zone_List:
-        
+
         # Incrementing Counter
         Counter = Counter + 1
-        
+
         # Creating Aggregated Zone name 1 : For the Aggregated Time Series
         Aggregated_Zone_Name_1 = Aggregation_Zone_NameStem + "_" + str(Counter)
-        
-        # Creating Aggregated Zone name 2 : For the Aggregated Equipment 
-        Aggregated_Zone_Name_2 = Aggregation_Zone_NameStem + "_Equipment_" + str(Counter)    
-        
+
+        # Creating Aggregated Zone name 2 : For the Aggregated Equipment
+        Aggregated_Zone_Name_2 = Aggregation_Zone_NameStem + "_Equipment_" + str(Counter)
+
         # Appending empty Aggregation_DF to Aggregation_Dict
         Aggregation_Dict[Aggregated_Zone_Name_1] = copy.deepcopy(Aggregation_DF)
-        
+
         Aggregation_Dict[Aggregated_Zone_Name_2] = copy.deepcopy(Aggregation_DF_Equipment)
 
 
     # =============================================================================
     # Creating Aggregated Data
     # =============================================================================
-        
+
     # Initializing Counter
     Counter = 0
-        
+
     # FOR LOOP: For each Aggregated Zone in Aggregation_Zone_List
     for Current_Aggregated_Zone_List in Aggregation_Zone_List:
-        
+
         # Incrementing Counter
         Counter = Counter + 1
-        
+
         # Creating Aggregated Zone name
         Aggregated_Zone_Name_1 = Aggregation_Zone_NameStem + "_" + str(Counter)
-        
-        Aggregated_Zone_Name_2 = Aggregation_Zone_NameStem + "_Equipment_" + str(Counter) 
-        
+
+        Aggregated_Zone_Name_2 = Aggregation_Zone_NameStem + "_Equipment_" + str(Counter)
+
         # FOR LOOP: For each Aggregation_VariableName in Aggregation_VariableNames_List
         for Current_Aggregation_VariableName in Aggregation_Dict[Aggregated_Zone_Name_1].columns:
-        
+
             # Getting Current_Aggregation_Variable Type
             Current_Aggregation_Variable_Type = Current_Aggregation_VariableName.split('_')[0]
-            
+
             # Aggregation Based on Current_Aggregation_Variable_Type
             if (Current_Aggregation_Variable_Type == 'Site' or Current_Aggregation_Variable_Type == 'Facility'): # Site
 
                 # Getting Current_Aggregation_Variable from IDF_OutputVariable_Dict
                 Current_Aggregation_Variable = IDF_OutputVariable_Dict[Current_Aggregation_VariableName[:-1]]
-                            
+
                 # Filling Aggregation_Dict with Current_Aggregation_Variable
                 Aggregation_Dict[Aggregated_Zone_Name_1][Current_Aggregation_VariableName] = Current_Aggregation_Variable.iloc[:, [1]]
-                
+
             elif (Current_Aggregation_Variable_Type == 'Zone'): # Zone
 
                 if Current_Aggregation_VariableName[:-1] in IDF_OutputVariable_Dict.keys():
@@ -3186,183 +3053,181 @@ def EPAgg_Button_Aggregate_Interaction(variable_selection, custom_variables, agg
 
                 # Getting Current_Aggregation_Variable from IDF_OutputVariable_Dict
                 Current_Aggregation_Variable = IDF_OutputVariable_Dict[Current_Aggregation_VariableName[:-1]]
-                            
+
                 # Getting Dataframe subset based on Current_Aggregated_Zone_List
                 Current_DF_Cols_Desired = []
-                
+
                 # Initializing Current_DF
                 Current_DF = pd.DataFrame()
-                
-                #  Getting Current_Aggregation_Variable_ColName_List 
+
+                #  Getting Current_Aggregation_Variable_ColName_List
                 Current_Aggregation_Variable_ColName_List = Current_Aggregation_Variable.columns
-                
+
                 # FOR LOOP: For each element in Current_Aggregated_Zone_List
                 for ColName1 in Current_Aggregated_Zone_List:
-                    
+
                     # FOR LOOP: For each element in Current_Aggregation_Variable_ColName_List
                     for ColName2 in Current_Aggregation_Variable_ColName_List:
-                        
+
                         # IF LOOP: For checking presence of ColName1 in ColName2
                         if (ColName2.find(ColName1) >= 0): # ColName1 present in ColName2
-                        
+
                             # Appending ColName2 to Current_DF_Cols_Desired
                             Current_DF_Cols_Desired.append(ColName2)
-                            
+
                             # IF ELSE LOOP: For Type_Aggregation
                             if (Type_Aggregation == 1): # Normal Aggregation
-                                
+
                                 # Do Nothing
                                 Do_Nothing = 0
-                                
+
                             elif (Type_Aggregation == 2): # Weighted Area Aggregation
-                                    
+
                                 # Aggregate by Area
                                 Current_Aggregation_Variable[ColName2] = Unique_Zone_Area_Dict[ColName1] * Current_Aggregation_Variable[ColName2]
-                                    
+
                             elif (Type_Aggregation == 3): # Weighted Volume Aggregation
-                                
+
                                 # Aggregate by Volume
                                 Current_Aggregation_Variable[ColName2] = Unique_Zone_Volume_Dict[ColName1] * Current_Aggregation_Variable[ColName2]
-                                
+
                     # IF ELSE LOOP: For filling Up Current_DF according to Current_Aggregation_VariableName
                     if ((Current_Aggregation_VariableName.find('Heat') >= 0) or (Current_Aggregation_VariableName.find('Gain') >= 0) or (Current_Aggregation_VariableName.find('Rate') >= 0) or (Current_Aggregation_VariableName.find('Power') >= 0) or (Current_Aggregation_VariableName.find('Energy') >= 0)): # Its an additive Variable
-                        
+
                         # Adding Column to Current_DF
                         Current_DF[ColName1] = Current_Aggregation_Variable[Current_DF_Cols_Desired].sum(1)
 
                     else: # It's a mean Variable
-                        
+
                         # Addding Column to Current_DF
                         Current_DF[ColName1] = Current_Aggregation_Variable[Current_DF_Cols_Desired].mean(1)
-    
+
                 # IF ELSE LOOP: For aggregating according to Type_Aggregation and storing in Aggregation_Dict
                 if (Type_Aggregation == 1): # Normal Aggregation
-                
+
                     # Filling Aggregation_Dict with Current_Aggregation_Variable
                     Aggregation_Dict[Aggregated_Zone_Name_1][Current_Aggregation_VariableName]  = Current_DF[Current_Aggregated_Zone_List].mean(1)
-                
+
                 elif (Type_Aggregation == 2): # Weighted Area Aggregation
-                    
+
                     # Filling Aggregation_Dict with Current_Aggregation_Variable
                     Aggregation_Dict[Aggregated_Zone_Name_1][Current_Aggregation_VariableName]  = (Current_DF[Current_Aggregated_Zone_List].sum(1))/(Zone_TotalArea_List[Counter])
-            
+
                 elif (Type_Aggregation == 3): # Weighted Volume Aggregation
 
                     # Filling Aggregation_Dict with Current_Aggregation_Variable
                     Aggregation_Dict[Aggregated_Zone_Name_1][Current_Aggregation_VariableName]  = (Current_DF[Current_Aggregated_Zone_List].sum(1))/(Zone_TotalVolume_List[Counter])
-            
-                
+
+
             elif (Current_Aggregation_Variable_Type == 'System'): # System Node
 
                 # Getting Current_Aggregation_Variable from IDF_OutputVariable_Dict
                 Current_Aggregation_Variable = IDF_OutputVariable_Dict[Current_Aggregation_VariableName[:-1]]
-                            
+
                 # Getting Dataframe subset based on Current_Aggregated_Zone_List
                 Current_DF_Cols_Desired = []
-                
-                #  Getting Current_Aggregation_Variable_ColName_List 
+
+                #  Getting Current_Aggregation_Variable_ColName_List
                 Current_Aggregation_Variable_ColName_List = Current_Aggregation_Variable.columns
-                
+
                 # FOR LOOP: For each element in Current_Aggregated_Zone_List
                 for ColName1 in Current_Aggregated_Zone_List:
-                    
+
                     # FOR LOOP: For each element in Current_Aggregation_Variable_ColName_List
                     for ColName2 in Current_Aggregation_Variable_ColName_List:
-                        
+
                         # IF LOOP: For checking presence of ColName1 in ColName2
                         if ((ColName2.find(ColName1) >= 0) and (ColName2.find(SystemNode_Name) >= 0)): # ColName1 present in ColName2
-                        
+
                             # Appending ColName2 to Current_DF_Cols_Desired
                             Current_DF_Cols_Desired.append(ColName2)
-                            
+
                             # IF ELSE LOOP: For Type_Aggregation
                             if (Type_Aggregation == 1): # Normal Aggregation
-                                
+
                                 # Do Nothing
                                 Do_Nothing = 0
-                                
+
                             elif (Type_Aggregation == 2): # Weighted Area Aggregation
-                                    
+
                                 # Aggregate by Area
                                 Current_Aggregation_Variable[ColName2] = Unique_Zone_Area_Dict[ColName1] * Current_Aggregation_Variable[ColName2]
-                                    
+
                             elif (Type_Aggregation == 3): # Weighted Volume Aggregation
-                                
+
                                 # Aggregate by Volume
                                 Current_Aggregation_Variable[ColName2] = Unique_Zone_Volume_Dict[ColName1] * Current_Aggregation_Variable[ColName2]
-                                
+
                 # IF ELSE LOOP: For aggregating according to Type_Aggregation and storing in Aggregation_Dict
                 if (Type_Aggregation == 1): # Normal Aggregation
-                
+
                     # Filling Aggregation_Dict with Current_Aggregation_Variable
                     Aggregation_Dict[Aggregated_Zone_Name_1][Current_Aggregation_VariableName]  = Current_Aggregation_Variable[Current_DF_Cols_Desired].mean(1)
-                
+
                 elif (Type_Aggregation == 2): # Weighted Area Aggregation
-                    
+
                     # Filling Aggregation_Dict with Current_Aggregation_Variable
                     Aggregation_Dict[Aggregated_Zone_Name_1][Current_Aggregation_VariableName]  = (Current_Aggregation_Variable[Current_DF_Cols_Desired].sum(1))/(Zone_TotalArea_List[Counter])
-            
+
                 elif (Type_Aggregation == 3): # Weighted Volume Aggregation
 
                     # Filling Aggregation_Dict with Current_Aggregation_Variable
                     Aggregation_Dict[Aggregated_Zone_Name_1][Current_Aggregation_VariableName]  = (Current_Aggregation_Variable[Current_DF_Cols_Desired].sum(1))/(Zone_TotalVolume_List[Counter])
-            
-                
-            elif (Current_Aggregation_Variable_Type == 'Schedule'): # Schedule            
 
-    
+            elif (Current_Aggregation_Variable_Type == 'Schedule'): # Schedule
+
                 # Getting Dataframe subset based on Current_Aggregated_Zone_List
-                Current_DF_Cols_Desired = []  
-                
+                Current_DF_Cols_Desired = []
+
                 # Create a CurrentLevel_List
                 CurrentLevel_List = []
 
                 # Creating Current_VariableName_1
                 Current_Aggregation_VariableName_1 = Current_Aggregation_VariableName.split('_')[0] + '_' + Current_Aggregation_VariableName.split('_')[1]
-                            
+
                 # Get Current_Element
                 Current_Element = Current_Aggregation_VariableName.split('_')[2]
-                
+
                 # Creating Current_EIO_Dict_Key
                 Current_EIO_Dict_Key = Current_Element + ' ' + 'Internal Gains Nominal'
 
                 # Creating Current_EIO_Dict_Key
                 Current_EIO_Dict_Key_Level = Current_Element + '_' + 'Level'
-                
+
                 # IF ELSE LOOP: For creating Current_EIO_Dict_Key_Level_ColName based on Current_Element
                 if (Current_Element == 'People'): # People
-                
+
                     Current_EIO_Dict_Key_Level_ColName = 'Number of People {}'
-                
+
                 elif (Current_Element == 'Lights'): # Lights
-                
+
                     Current_EIO_Dict_Key_Level_ColName = 'Lighting Level {W}'
-                
+
                 else: # ElectricEquipment, OtherEquipment, HotWaterEquipment, SteamEquipment
-                
+
                     Current_EIO_Dict_Key_Level_ColName = 'Equipment Level {W}'
-                
+
                 # Getting Current_EIO_Dict_DF
                 Current_EIO_Dict_DF = Eio_OutputFile_Dict[Current_EIO_Dict_Key]
-                
+
                 # Getting Current_Aggregation_Variable from IDF_OutputVariable_Dict
                 Current_Aggregation_Variable = IDF_OutputVariable_Dict[Current_Aggregation_VariableName_1]
 
-                #  Getting Current_Aggregation_Variable_ColName_List 
+                #  Getting Current_Aggregation_Variable_ColName_List
                 Current_Aggregation_Variable_ColName_List = Current_Aggregation_Variable.columns
-                                    
+
                 # FOR LOOP: For each element in Current_Aggregated_Zone_List
                 for ColName1 in Current_Aggregated_Zone_List:
-                    
+
                     # Getting ColName2 from the 'Schedule Name' Column of Current_EIO_Dict_DF
                     ColName2 = str(Current_EIO_Dict_DF[Current_EIO_Dict_DF['Zone Name'] == ColName1]['Schedule Name'].iloc[0])
-            
+
                     # Appending ColName2 to Current_DF_Cols_Desired
                     Current_DF_Cols_Desired.append(ColName2)
-                    
+
                     # Getting Equipment Level
                     Current_EquipmentLevel = float(Current_EIO_Dict_DF[Current_EIO_Dict_DF['Zone Name'] == ColName1][Current_EIO_Dict_Key_Level_ColName].iloc[0])
-                        
+
                     # Appending Current_EquipmentLevel to CurrentLevel_List
                     CurrentLevel_List.append(Current_EquipmentLevel)
 
@@ -3386,7 +3251,7 @@ def EPAgg_Button_Aggregate_Interaction(variable_selection, custom_variables, agg
     if os.path.isdir(results_path):
         z = 0
     else:
-        os.mkdir(results_path)  
+        os.mkdir(results_path)
 
     pickle.dump(Aggregation_Dict, open(os.path.join(results_path,'Aggregation_Dictionary.pickle'), "wb"))
 
@@ -3399,7 +3264,7 @@ def EPAgg_Button_Aggregate_Interaction(variable_selection, custom_variables, agg
 def EPAgg_Button_Download_Interaction(n_clicks):
 
     results_path = os.path.join(WORKSPACE_DIRECTORY, "Aggregation", "Results")
-    
+
     for item in os.listdir(results_path):
         if item.endswith(".pickle"):
             download_path = os.path.join(results_path,item)
@@ -3415,7 +3280,7 @@ def EPVis_RadioButton_DataSource_Interaction(data_source):
     if data_source == 1:
         data_selection = False
         upload_data = True
-    
+
     elif data_source == 2:
         data_selection = True
         upload_data = False
@@ -3435,7 +3300,7 @@ def EPVis_Upload_GeneratedData_Interaction(filename, content):
     if filename is not None and content is not None:
         AppFuncs.save_file('Generated.pickle', content, UPLOAD_DIRECTORY_VIS)
         message = filename + ' uploaded successfully'
-    
+
     else:
         message = 'Drag and Drop or Select Files for Generated Data'
 
@@ -3569,22 +3434,20 @@ def EPVis_Radio_DataToBeSelected_Interaction(InputSelection, selection):
         # For testing purposes
         SIMULATION_FOLDERPATH = os.path.join(WORKSPACE_DIRECTORY, 'sim1')
 
-        # Copying generated file from previous session 
+        # Copying generated file from previous session
         Sim_IDFProcessedData_FolderName = 'Sim_ProcessedData'
         Sim_IDFProcessedData_FolderPath = os.path.join(SIMULATION_FOLDERPATH, "Final_run_folder", Sim_IDFProcessedData_FolderName)
         shutil.copy(os.path.join(Sim_IDFProcessedData_FolderPath,'IDF_OutputVariables_DictDF.pickle'), os.path.join(Visualization_FolderPath,'Generated.pickle'))
-        
+
         # Copying aggregated file from previous session
         results_path = os.path.join(WORKSPACE_DIRECTORY, "Aggregation", "Results")
-        shutil.copy(os.path.join(results_path,'Aggregation_Dictionary.pickle'), os.path.join(Visualization_FolderPath,'Aggregated.pickle')) 
+        shutil.copy(os.path.join(results_path,'Aggregation_Dictionary.pickle'), os.path.join(Visualization_FolderPath,'Aggregated.pickle'))
 
     # Upload files -> copying uploaded files and renaming
     elif InputSelection == 2:
 
         for item in os.listdir(UPLOAD_DIRECTORY_VIS):
             shutil.copy(os.path.join(UPLOAD_DIRECTORY_VIS,item), Visualization_FolderPath)
-
-
 
     if selection == 1:
         # Finding min and max dates from generated data
@@ -3600,7 +3463,6 @@ def EPVis_Radio_DataToBeSelected_Interaction(InputSelection, selection):
 
         Aggregated_Variables = []
 
-    
     elif selection == 2:
         # Finding min and max dates from generated data
         Aggregated_Dict_file = open(os.path.join(Visualization_FolderPath,'Aggregated.pickle'),"rb")
@@ -3612,9 +3474,8 @@ def EPVis_Radio_DataToBeSelected_Interaction(InputSelection, selection):
         Generated_Variables = []
 
         # Getting aggregated date variables
-        Aggregated_Variables = list(Aggregated_OutputVariable_Dict.keys())
-        Aggregated_Variables.remove('DateTime_List')
-    
+        Aggregated_Variables = list(Aggregated_OutputVariable_Dict['Aggregation_Zone_1'].columns)
+
     elif selection == 3:
         # Finding min and max dates from generated data
         Generated_Dict_file = open(os.path.join(Visualization_FolderPath,'Generated.pickle'),"rb")
@@ -3638,8 +3499,7 @@ def EPVis_Radio_DataToBeSelected_Interaction(InputSelection, selection):
         Generated_Variables.remove('DateTime_List')
 
         # Getting aggregated date variables
-        Aggregated_Variables = list(Aggregated_OutputVariable_Dict.keys())
-        Aggregated_Variables.remove('DateTime_List')
+        Aggregated_Variables = list(Aggregated_OutputVariable_Dict['Aggregation_Zone_1'].columns)
 
     min_date_upload = min_date_upload.replace(hour = 0, minute = 0)
     max_date_upload = max_date_upload.replace(hour = 0, minute = 0)
@@ -3663,13 +3523,37 @@ def EPVis_DropDown_GeneratedDataTables_Interaction(variable):
     Output(component_id = 'EPVis_DropDown_AggregatedDataColumns', component_property = 'options'),
     Input(component_id = 'EPVis_DropDown_AggregatedDataTables', component_property = 'value'),
     prevent_initial_call = True)
-def EPVis_DropDown_GeneratedDataTables_Interaction(variable):
+def EPVis_DropDown_AggregatedDataTables_Interaction(variable):
     columns = []
     if variable is not None:
         Aggregated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Aggregated.pickle'),"rb")
         Aggregated_OutputVariable_Dict = pickle.load(Aggregated_Dict_file)
-        columns = list(Aggregated_OutputVariable_Dict[variable].columns)
+        columns = [x for x in Aggregated_OutputVariable_Dict if (x.find('Aggregation_Zone_')>=0) and not (x.find('Aggregation_Zone_Equipment_')>=0)]
     return columns
+
+@app.callback(
+    Output(component_id = 'EPVis_Graph_Distribution', component_property = 'figure'),
+    State(component_id = 'EPVis_DropDown_GeneratedDataTables', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_GeneratedDataColumns', component_property = 'value'),
+    Input(component_id = 'EPVis_Button_DistGeneratedData', component_property = 'n_clicks'),
+    prevent_initial_call = True)
+def EPVis_Button_DistGeneratedData_Interaction(table, column, n_clicks):
+    Generated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Generated.pickle'),"rb")
+    Generated_OutputVariable_Dict = pickle.load(Generated_Dict_file)
+    figure = px.histogram(Generated_OutputVariable_Dict[table][column].to_frame(), x = column, title = 'Title', marginal="rug")
+    return figure
+
+@app.callback(
+    Output(component_id = 'EPVis_Graph_Distribution', component_property = 'figure'),
+    State(component_id = 'EPVis_DropDown_GeneratedDataTables', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_GeneratedDataColumns', component_property = 'value'),
+    Input(component_id = 'EPVis_Button_DistGeneratedData', component_property = 'n_clicks'),
+    prevent_initial_call = True)
+def EPVis_Button_DistAggregatedData_Interaction(table, column, n_clicks):
+    Generated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Generated.pickle'),"rb")
+    Generated_OutputVariable_Dict = pickle.load(Generated_Dict_file)
+    figure = px.histogram(Generated_OutputVariable_Dict[table][column].to_frame(), x = column, title = 'Title', marginal="rug")
+    return figure
 
 # Running the App
 if __name__ == '__main__':
