@@ -1,4 +1,4 @@
-Program Version,EnergyPlus, Version 9.0.1-bb7ca4f0da, YMD=2024.07.02 13:21,
+Program Version,EnergyPlus, Version 9.0.1-bb7ca4f0da, YMD=2024.07.10 12:11,
    ** Warning ** Sizing:Parameters: note Timesteps in Averaging Window entered value=[6] is less than 1 hour (i.e., 12 timesteps).
    ************* Beginning Zone Sizing Calculations
    ** Warning ** CheckUsedConstructions: There are 23 nominally unused constructions in input.
@@ -83,4 +83,4 @@ Program Version,EnergyPlus, Version 9.0.1-bb7ca4f0da, YMD=2024.07.02 13:21,
    *************
    ************* EnergyPlus Warmup Error Summary. During Warmup: 0 Warning; 0 Severe Errors.
    ************* EnergyPlus Sizing Error Summary. During Sizing: 6 Warning; 0 Severe Errors.
-   ************* EnergyPlus Completed Successfully-- 28 Warning; 0 Severe Errors; Elapsed Time=00hr 00min 18.84sec
+   ************* EnergyPlus Completed Successfully-- 28 Warning; 0 Severe Errors; Elapsed Time=00hr 00min 36.63sec

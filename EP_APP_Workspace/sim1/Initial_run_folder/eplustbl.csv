@@ -1,4 +1,4 @@
-Program Version:,EnergyPlus, Version 9.0.1-bb7ca4f0da, YMD=2024.07.02 13:20
+Program Version:,EnergyPlus, Version 9.0.1-bb7ca4f0da, YMD=2024.07.10 11:59
 Tabular Output Report in Format: ,Comma
 
 Building:,OfficeSmall
@@ -176,7 +176,7 @@ FOR:,Entire Facility
 General
 
 ,,Value
-,Program Version and Build,EnergyPlus, Version 9.0.1-bb7ca4f0da, YMD=2024.07.02 13:20
+,Program Version and Build,EnergyPlus, Version 9.0.1-bb7ca4f0da, YMD=2024.07.10 11:59
 ,RunPeriod,RUNPERIOD 1
 ,Weather File,Seattle Seattle Tacoma Intl A WA USA TMY3 WMO#=727930
 ,Latitude [deg],47.47

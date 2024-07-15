@@ -1,4 +1,4 @@
-Program Version:,EnergyPlus, Version 9.0.1-bb7ca4f0da, YMD=2024.07.02 13:21
+Program Version:,EnergyPlus, Version 9.0.1-bb7ca4f0da, YMD=2024.07.10 12:11
 Tabular Output Report in Format: ,Comma
 
 Building:,OfficeSmall
@@ -176,7 +176,7 @@ FOR:,Entire Facility
 General
 
 ,,Value
-,Program Version and Build,EnergyPlus, Version 9.0.1-bb7ca4f0da, YMD=2024.07.02 13:21
+,Program Version and Build,EnergyPlus, Version 9.0.1-bb7ca4f0da, YMD=2024.07.10 12:11
 ,RunPeriod,RUNPERIOD 1
 ,Weather File,Seattle Seattle Tacoma Intl A WA USA TMY3 WMO#=727930
 ,Latitude [deg],47.47
@@ -3228,125 +3228,5 @@ Custom Monthly Report
 ,Annual Sum or Average,0.24,,,,,,
 ,Minimum of Months,0.02,0.00,0.00,0.00,0.00,0.00,0.00
 ,Maximum of Months,0.02,0.00,0.00,0.00,0.00,0.00,0.00
-
-
-----------------------------------------------------------------------------------------------------
-REPORT:,AirLoopSystemEnergyAndWaterUseMonthly
-FOR:,PSZ-AC:1
-Custom Monthly Report
-
-,,AIR SYSTEM HOT WATER ENERGY [],AIR SYSTEM STEAM ENERGY [],AIR SYSTEM CHILLED WATER ENERGY [J],AIR SYSTEM ELECTRIC ENERGY [],AIR SYSTEM GAS ENERGY [],AIR SYSTEM WATER VOLUME []
-,January,0.00,0.00,0.00,0.00,0.00,0.00
-,February,0.00,0.00,0.00,0.00,0.00,0.00
-,March,0.00,0.00,0.00,0.00,0.00,0.00
-,April,0.00,0.00,0.00,0.00,0.00,0.00
-,May,0.00,0.00,0.00,0.00,0.00,0.00
-,June,0.00,0.00,0.00,0.00,0.00,0.00
-,July,0.00,0.00,0.00,0.00,0.00,0.00
-,August,0.00,0.00,0.00,0.00,0.00,0.00
-,September,0.00,0.00,0.00,0.00,0.00,0.00
-,October,0.00,0.00,0.00,0.00,0.00,0.00
-,November,0.00,0.00,0.00,0.00,0.00,0.00
-,December,0.00,0.00,0.00,0.00,0.00,0.00
-,,,,,,,
-,Annual Sum or Average,,,0.00,,,
-,Minimum of Months,0.00,0.00,0.00,0.00,0.00,0.00
-,Maximum of Months,0.00,0.00,0.00,0.00,0.00,0.00
-
-
-----------------------------------------------------------------------------------------------------
-REPORT:,AirLoopSystemEnergyAndWaterUseMonthly
-FOR:,PSZ-AC:2
-Custom Monthly Report
-
-,,AIR SYSTEM HOT WATER ENERGY [],AIR SYSTEM STEAM ENERGY [],AIR SYSTEM CHILLED WATER ENERGY [J],AIR SYSTEM ELECTRIC ENERGY [],AIR SYSTEM GAS ENERGY [],AIR SYSTEM WATER VOLUME []
-,January,0.00,0.00,0.00,0.00,0.00,0.00
-,February,0.00,0.00,0.00,0.00,0.00,0.00
-,March,0.00,0.00,0.00,0.00,0.00,0.00
-,April,0.00,0.00,0.00,0.00,0.00,0.00
-,May,0.00,0.00,0.00,0.00,0.00,0.00
-,June,0.00,0.00,0.00,0.00,0.00,0.00
-,July,0.00,0.00,0.00,0.00,0.00,0.00
-,August,0.00,0.00,0.00,0.00,0.00,0.00
-,September,0.00,0.00,0.00,0.00,0.00,0.00
-,October,0.00,0.00,0.00,0.00,0.00,0.00
-,November,0.00,0.00,0.00,0.00,0.00,0.00
-,December,0.00,0.00,0.00,0.00,0.00,0.00
-,,,,,,,
-,Annual Sum or Average,,,0.00,,,
-,Minimum of Months,0.00,0.00,0.00,0.00,0.00,0.00
-,Maximum of Months,0.00,0.00,0.00,0.00,0.00,0.00
-
-
-----------------------------------------------------------------------------------------------------
-REPORT:,AirLoopSystemEnergyAndWaterUseMonthly
-FOR:,PSZ-AC:3
-Custom Monthly Report
-
-,,AIR SYSTEM HOT WATER ENERGY [],AIR SYSTEM STEAM ENERGY [],AIR SYSTEM CHILLED WATER ENERGY [J],AIR SYSTEM ELECTRIC ENERGY [],AIR SYSTEM GAS ENERGY [],AIR SYSTEM WATER VOLUME []
-,January,0.00,0.00,0.00,0.00,0.00,0.00
-,February,0.00,0.00,0.00,0.00,0.00,0.00
-,March,0.00,0.00,0.00,0.00,0.00,0.00
-,April,0.00,0.00,0.00,0.00,0.00,0.00
-,May,0.00,0.00,0.00,0.00,0.00,0.00
-,June,0.00,0.00,0.00,0.00,0.00,0.00
-,July,0.00,0.00,0.00,0.00,0.00,0.00
-,August,0.00,0.00,0.00,0.00,0.00,0.00
-,September,0.00,0.00,0.00,0.00,0.00,0.00
-,October,0.00,0.00,0.00,0.00,0.00,0.00
-,November,0.00,0.00,0.00,0.00,0.00,0.00
-,December,0.00,0.00,0.00,0.00,0.00,0.00
-,,,,,,,
-,Annual Sum or Average,,,0.00,,,
-,Minimum of Months,0.00,0.00,0.00,0.00,0.00,0.00
-,Maximum of Months,0.00,0.00,0.00,0.00,0.00,0.00
-
-
-----------------------------------------------------------------------------------------------------
-REPORT:,AirLoopSystemEnergyAndWaterUseMonthly
-FOR:,PSZ-AC:4
-Custom Monthly Report
-
-,,AIR SYSTEM HOT WATER ENERGY [],AIR SYSTEM STEAM ENERGY [],AIR SYSTEM CHILLED WATER ENERGY [J],AIR SYSTEM ELECTRIC ENERGY [],AIR SYSTEM GAS ENERGY [],AIR SYSTEM WATER VOLUME []
-,January,0.00,0.00,0.00,0.00,0.00,0.00
-,February,0.00,0.00,0.00,0.00,0.00,0.00
-,March,0.00,0.00,0.00,0.00,0.00,0.00
-,April,0.00,0.00,0.00,0.00,0.00,0.00
-,May,0.00,0.00,0.00,0.00,0.00,0.00
-,June,0.00,0.00,0.00,0.00,0.00,0.00
-,July,0.00,0.00,0.00,0.00,0.00,0.00
-,August,0.00,0.00,0.00,0.00,0.00,0.00
-,September,0.00,0.00,0.00,0.00,0.00,0.00
-,October,0.00,0.00,0.00,0.00,0.00,0.00
-,November,0.00,0.00,0.00,0.00,0.00,0.00
-,December,0.00,0.00,0.00,0.00,0.00,0.00
-,,,,,,,
-,Annual Sum or Average,,,0.00,,,
-,Minimum of Months,0.00,0.00,0.00,0.00,0.00,0.00
-,Maximum of Months,0.00,0.00,0.00,0.00,0.00,0.00
-
-
-----------------------------------------------------------------------------------------------------
-REPORT:,AirLoopSystemEnergyAndWaterUseMonthly
-FOR:,PSZ-AC:5
-Custom Monthly Report
-
-,,AIR SYSTEM HOT WATER ENERGY [],AIR SYSTEM STEAM ENERGY [],AIR SYSTEM CHILLED WATER ENERGY [J],AIR SYSTEM ELECTRIC ENERGY [],AIR SYSTEM GAS ENERGY [],AIR SYSTEM WATER VOLUME []
-,January,0.00,0.00,0.00,0.00,0.00,0.00
-,February,0.00,0.00,0.00,0.00,0.00,0.00
-,March,0.00,0.00,0.00,0.00,0.00,0.00
-,April,0.00,0.00,0.00,0.00,0.00,0.00
-,May,0.00,0.00,0.00,0.00,0.00,0.00
-,June,0.00,0.00,0.00,0.00,0.00,0.00
-,July,0.00,0.00,0.00,0.00,0.00,0.00
-,August,0.00,0.00,0.00,0.00,0.00,0.00
-,September,0.00,0.00,0.00,0.00,0.00,0.00
-,October,0.00,0.00,0.00,0.00,0.00,0.00
-,November,0.00,0.00,0.00,0.00,0.00,0.00
-,December,0.00,0.00,0.00,0.00,0.00,0.00
-,,,,,,,
-,Annual Sum or Average,,,0.00,,,
-,Minimum of Months,0.00,0.00,0.00,0.00,0.00,0.00
-,Maximum of Months,0.00,0.00,0.00,0.00,0.00,0.00
 
 

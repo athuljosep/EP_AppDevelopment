@@ -4475,7 +4475,7 @@ Output:Table:SummaryReports,
 
 Output:Variable,
     *,                             ! Key Value
-    Air System Chilled Water Energy,    ! Variable Name
+    System Node Mass Flow Rate,    ! Variable Name
     timestep;                      ! Reporting Frequency
 
 
