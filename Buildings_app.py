@@ -12,12 +12,13 @@ import datetime
 import pickle
 import copy
 from datetime import date
-from dash import Dash, dcc, html, Input, Output, State
+from dash import Dash, dcc, html, Input, Output, State, dash_table
 import pandas as pd
 import numpy as np
 import opyplus as op
 import dash_daq as daq
 import plotly.express as px
+import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 
 # Importing User-Defined Modules
@@ -1044,6 +1045,7 @@ app.layout = dbc.Container([
 
                         dcc.Dropdown([], '',
                             id='EPVis_DropDown_GeneratedDataColumns',
+                            multi = True,
                             style = {
                                 'width': '95%',
                                 'margin-left': '2.5%', 
@@ -1079,6 +1081,7 @@ app.layout = dbc.Container([
 
                         dcc.Dropdown([], '',
                             id='EPVis_DropDown_AggregatedDataColumns',
+                            multi = True,
                             style = {
                                 'width': '95%',
                                 'margin-left': '2.5%', 
@@ -1174,6 +1177,13 @@ app.layout = dbc.Container([
             ]),
 
             html.Div([
+                dbc.Row([
+                    dash_table.DataTable(
+                        id='EPVis_Table_GeneratedData',
+                        columns=['Variable', 'Mean', 'Variance', 'Standard Deviation', 'Range'],
+                        data=None
+                    ),
+                ]),
                 dbc.Row([
                     dbc.Col([html.H4('Generated Data')], width = 2),
                     dbc.Col([html.H4('Mean:')], width = 2),
@@ -3532,7 +3542,8 @@ def EPVis_DropDown_AggregatedDataTables_Interaction(variable):
     return columns
 
 @app.callback(
-    Output(component_id = 'EPVis_Graph_Distribution', component_property = 'figure'),
+    Output(component_id = 'EPVis_Graph_Distribution', component_property = 'figure', allow_duplicate = True),
+    Output(component_id = 'EPVis_Table_GeneratedData', component_property = 'data', allow_duplicate = True),
     State(component_id = 'EPVis_DropDown_GeneratedDataTables', component_property = 'value'),
     State(component_id = 'EPVis_DropDown_GeneratedDataColumns', component_property = 'value'),
     Input(component_id = 'EPVis_Button_DistGeneratedData', component_property = 'n_clicks'),
@@ -3540,19 +3551,84 @@ def EPVis_DropDown_AggregatedDataTables_Interaction(variable):
 def EPVis_Button_DistGeneratedData_Interaction(table, column, n_clicks):
     Generated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Generated.pickle'),"rb")
     Generated_OutputVariable_Dict = pickle.load(Generated_Dict_file)
-    figure = px.histogram(Generated_OutputVariable_Dict[table][column].to_frame(), x = column, title = 'Title', marginal="rug")
+    
+    # Creating DF for plotting
+    Data_DF = pd.DataFrame()
+    for item in column:
+        Current_DF = Generated_OutputVariable_Dict[table][item].to_frame()
+        Current_DF = Current_DF.rename(columns={item: 'ColName'})
+        Current_DF['dataset'] = item
+        Data_DF = pd.concat([Data_DF, Current_DF])
+
+    # Plotting the combined DF
+    figure = px.histogram(Data_DF, x='ColName', color='dataset', histnorm='probability')
+    figure.update_layout(xaxis_title='Support')
+    figure.update_layout(yaxis_title='Probability')
+
+    data = []
+
+    return figure,data
+
+@app.callback(
+    Output(component_id = 'EPVis_Graph_Distribution', component_property = 'figure',allow_duplicate = True),
+    State(component_id = 'EPVis_DropDown_AggregatedDataTables', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_AggregatedDataColumns', component_property = 'value'),
+    Input(component_id = 'EPVis_Button_DistAggregatedData', component_property = 'n_clicks'),
+    prevent_initial_call = True)
+def EPVis_Button_DistAggregatedData_Interaction(table, column, n_clicks):
+    Aggregated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Aggregated.pickle'),"rb")
+    Aggregated_OutputVariable_Dict = pickle.load(Aggregated_Dict_file)
+    
+    # Creating DF for plotting
+    Data_DF = pd.DataFrame()
+    for item in column:
+        Current_DF = Aggregated_OutputVariable_Dict[item][table].to_frame()
+        Current_DF = Current_DF.rename(columns={table: 'ColName'})
+        Current_DF['dataset'] = item
+        Data_DF = pd.concat([Data_DF, Current_DF])
+
+    # Plotting the combined DF
+    figure = px.histogram(Data_DF, x='ColName', color='dataset', histnorm='probability')
+    figure.update_layout(xaxis_title='Support')
+    figure.update_layout(yaxis_title='Probability')
     return figure
 
 @app.callback(
-    Output(component_id = 'EPVis_Graph_Distribution', component_property = 'figure'),
+    Output(component_id = 'EPVis_Graph_Distribution', component_property = 'figure',allow_duplicate = True),
     State(component_id = 'EPVis_DropDown_GeneratedDataTables', component_property = 'value'),
     State(component_id = 'EPVis_DropDown_GeneratedDataColumns', component_property = 'value'),
-    Input(component_id = 'EPVis_Button_DistGeneratedData', component_property = 'n_clicks'),
+    State(component_id = 'EPVis_DropDown_AggregatedDataTables', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_AggregatedDataColumns', component_property = 'value'),
+    Input(component_id = 'EPVis_Button_DistBothData', component_property = 'n_clicks'),
     prevent_initial_call = True)
-def EPVis_Button_DistAggregatedData_Interaction(table, column, n_clicks):
+def EPVis_Button_DistBothData_Interaction(table_gen, column_gen, table_agg, column_agg, n_clicks):
+    # Generated Data 
     Generated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Generated.pickle'),"rb")
     Generated_OutputVariable_Dict = pickle.load(Generated_Dict_file)
-    figure = px.histogram(Generated_OutputVariable_Dict[table][column].to_frame(), x = column, title = 'Title', marginal="rug")
+    
+    # Creating DF for plotting
+    Data_DF = pd.DataFrame()
+    for item in column_gen:
+        Current_DF = Generated_OutputVariable_Dict[table_gen][item].to_frame()
+        Current_DF = Current_DF.rename(columns={item: 'ColName'})
+        Current_DF['dataset'] = item
+        Data_DF = pd.concat([Data_DF, Current_DF])
+
+    # Aggregated Data
+    Aggregated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Aggregated.pickle'),"rb")
+    Aggregated_OutputVariable_Dict = pickle.load(Aggregated_Dict_file)
+    
+    # Creating DF for plotting
+    for item in column_agg:
+        Current_DF = Aggregated_OutputVariable_Dict[item][table_agg].to_frame()
+        Current_DF = Current_DF.rename(columns={table_agg: 'ColName'})
+        Current_DF['dataset'] = item
+        Data_DF = pd.concat([Data_DF, Current_DF])
+
+    # Plotting the combined DF
+    figure = px.histogram(Data_DF, x='ColName', color='dataset', histnorm='probability')
+    figure.update_layout(xaxis_title='Support')
+    figure.update_layout(yaxis_title='Probability')
     return figure
 
 # Running the App

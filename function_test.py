@@ -1,32 +1,25 @@
 # This function helps to test individual functionalities
-import zlib
-import zipfile
-import os
+import plotly.express as px
+import pandas as pd
 
-def compress(file_names):
-    print("File Paths:")
-    print(file_names)
-
-    # Select the compression mode ZIP_DEFLATED for compression
-    # or zipfile.ZIP_STORED to just store the file
-    compression = zipfile.ZIP_DEFLATED
-
-    # create the zip file first parameter path/name, second mode
-    zf = zipfile.ZipFile(os.getcwd() + "\\RAWs.zip", mode="w")
-    try:
-        for file_name in file_names:
-            # Add file to the zip file
-            # first parameter file to zip, second filename in zip
-            file_name1 = file_name.split('\\')[-1]
-
-            zf.write(file_name, file_name1, compress_type=compression)
-
-    except FileNotFoundError:
-        print("An error occurred")
-    finally:
-        # Don't forget to close the file!
-        zf.close()
+# Sample data
+data = {'values': [10, 20, 30, 40, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110]}
+df = pd.DataFrame(data)
 
 
-file_names= [os.getcwd() + "\\text_file.txt", os.getcwd() + "\\text_file2.txt"]
-compress(file_names)
+data1 = {'values1': [100, 200, 300, 400, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100]}
+df1 = pd.DataFrame(data1)
+
+# Create histogram
+fig = px.histogram(df, x='values')
+fig1 = px.histogram(df1, x='values1')
+line_trace = fig1.data[0]
+fig.add_trace(line_trace)
+
+# Update x-axis label
+fig.update_layout(xaxis_title='Value Distribution')
+
+
+
+# Show plot
+fig.show()
