@@ -1243,6 +1243,19 @@ app.layout = dbc.Container([
             # Break Row
             dbc.Row([dbc.Col([html.Br()], width = 12),]),
 
+            dbc.Row([
+
+                dbc.Col([
+
+                    html.H5("Please select two variables",
+                            className = 'text-left text-secondary mb-2',
+                            id = 'EPVis_H5_ScatterPlotComment',
+                            hidden = False)
+
+                    ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
+
+                ], justify = "left", align = "center"),
+
             # Row 14
             dbc.Row([
 
@@ -1283,7 +1296,7 @@ app.layout = dbc.Container([
 
                 dbc.Col([
 
-                    dcc.Graph(id = 'Graph2', figure ={}),
+                    dcc.Graph(id = 'EPVis_Graph_Scatter', figure ={}),
 
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
 
@@ -1350,7 +1363,7 @@ app.layout = dbc.Container([
 
                 dbc.Col([
 
-                    dcc.Graph(id = 'Graph3', figure ={}),
+                    dcc.Graph(id = 'EPVis_Graph_TimeSeries', figure ={}),
 
                     ], xs = 12, sm = 12, md = 12, lg = 12, xl = 12), # width = 12
 
@@ -3629,6 +3642,111 @@ def EPVis_Button_DistBothData_Interaction(table_gen, column_gen, table_agg, colu
     figure = px.histogram(Data_DF, x='ColName', color='dataset', histnorm='probability')
     figure.update_layout(xaxis_title='Support')
     figure.update_layout(yaxis_title='Probability')
+    return figure
+
+@app.callback(
+    Output(component_id = 'EPVis_H5_ScatterPlotComment', component_property = 'hidden'),
+    Input(component_id = 'EPVis_DropDown_GeneratedDataColumns', component_property = 'value'),
+    Input(component_id = 'EPVis_DropDown_AggregatedDataColumns', component_property = 'value'),
+    prevent_initial_call = True)
+def EPVis_H5_ScatterPlotComment_Interaction(gen_column, agg_column):
+    if gen_column is None:
+        gen_column = []
+    if agg_column is None:
+        agg_column = []
+
+    total_elements = len(gen_column) + len(agg_column)
+    if total_elements == 2:
+        comment = True
+    else:
+        comment = False
+    return comment
+
+@app.callback(
+    Output(component_id = 'EPVis_Graph_Scatter', component_property = 'figure',allow_duplicate = True),
+    State(component_id = 'EPVis_DropDown_GeneratedDataTables', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_GeneratedDataColumns', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_AggregatedDataTables', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_AggregatedDataColumns', component_property = 'value'),
+    Input(component_id = 'EPVis_Button_ScatterGeneratedData', component_property = 'n_clicks'),
+    prevent_initial_call = True)
+def EPVis_Button_ScatGeneratedData_Interaction(table_gen, column_gen, table_agg, column_agg, n_clicks):
+    # Generated Data
+    Generated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Generated.pickle'),"rb")
+    Generated_OutputVariable_Dict = pickle.load(Generated_Dict_file)
+
+    # Aggregated Data
+    Aggregated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Aggregated.pickle'),"rb")
+    Aggregated_OutputVariable_Dict = pickle.load(Aggregated_Dict_file)
+
+    # Creating DF for plotting
+    if len(column_gen) == 2:
+        df = pd.DataFrame({
+            column_gen[0]:Generated_OutputVariable_Dict[table_gen][column_gen[0]],
+            column_gen[1]:Generated_OutputVariable_Dict[table_gen][column_gen[1]]
+        })
+
+    elif len(column_agg) == 2:
+        df = pd.DataFrame({
+            column_agg[0]:Aggregated_OutputVariable_Dict[column_agg[0]][table_agg],
+            column_agg[1]:Aggregated_OutputVariable_Dict[column_agg[1]][table_agg]
+        })
+
+    else:
+        df = pd.DataFrame({
+            column_gen[0]:Generated_OutputVariable_Dict[table_gen][column_gen[0]],
+            column_agg[0]:Aggregated_OutputVariable_Dict[column_agg[0]][table_agg]
+        })
+
+    # Plotting the combined DF
+    figure = px.scatter(df, x = df[df.columns[0]], y = df[df.columns[1]],
+                        labels = {'x': df[df.columns[0]], 'y': df[df.columns[1]]})
+
+    return figure
+
+@app.callback(
+    Output(component_id = 'EPVis_Graph_TimeSeries', component_property = 'figure',allow_duplicate = True),
+    State(component_id = 'EPVis_DropDown_GeneratedDataTables', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_GeneratedDataColumns', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_AggregatedDataTables', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_AggregatedDataColumns', component_property = 'value'),
+    Input(component_id = 'EPVis_Button_TimeGeneratedData', component_property = 'n_clicks'),
+    prevent_initial_call = True)
+def EPVis_Button_TimeGeneratedData_Interaction(table_gen, column_gen, table_agg, column_agg, n_clicks):
+    # Generated Data
+    Generated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Generated.pickle'),"rb")
+    Generated_OutputVariable_Dict = pickle.load(Generated_Dict_file)
+
+    # Aggregated Data
+    Aggregated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Aggregated.pickle'),"rb")
+    Aggregated_OutputVariable_Dict = pickle.load(Aggregated_Dict_file)
+
+    Data_DF = Generated_OutputVariable_Dict[table_gen][column_gen]
+
+    # Creating DF for plotting
+    column_agg_new = []
+    for item in column_agg:
+        Current_DF = Aggregated_OutputVariable_Dict[item][table_agg].to_frame()
+        column_name = "".join([item, table_agg])
+        column_agg_new.append(column_name)
+        Current_DF = Current_DF.rename(columns={table_agg: column_name})
+        Data_DF = pd.concat([Data_DF, Current_DF], axis=1)
+
+    if column_gen is not None:
+        time_list = pd.DataFrame(Generated_OutputVariable_Dict['DateTime_List'], columns=['Date'])
+    elif column_agg is not None:
+        time_list = pd.DataFrame(Aggregated_OutputVariable_Dict['DateTime_List'], columns=['Date'])
+
+    # Merging the dataframes
+    merged_df = pd.concat([time_list, Data_DF], axis=1)
+
+    # Melting the dataframe for Plotly Express
+    variable_list = column_gen+column_agg_new
+    melted_df = merged_df.melt(id_vars='Date', value_vars=variable_list, var_name='Variable', value_name='Value')
+
+    # Plotting the time series using Plotly Express
+    figure = px.line(melted_df, x='Date', y='Value', color='Variable', labels={'Date': 'Date', 'Value': 'Variable', 'Variable': 'Data Series'})
+
     return figure
 
 # Running the App
