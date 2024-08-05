@@ -288,7 +288,7 @@ app.layout = dbc.Container([
                                 'margin':'5%'
                                 },),
 
-                        html.Label("Total variables available for selection",
+                        html.Label("Select Custom Variables",
                             className = 'text-left ms-4'),
                         dcc.Dropdown(options = [],
                             value = '',
@@ -300,7 +300,7 @@ app.layout = dbc.Container([
                                 'margin-bottom':'5%'
                                 }),
 
-                        html.Label("Already selected variables",
+                        html.Label("Preselected variables",
                             className = 'text-left ms-4 mt-0'),
                         dcc.Dropdown(options = [],
                             value = '',
@@ -316,8 +316,8 @@ app.layout = dbc.Container([
                             labelStyle = {'display': 'block'},
                             value = '',
                             options = [
-                                {'label' : " Our Variable Selection", 'value' : 1},
-                                {'label' : " Your Variable Selection", 'value' : 2}
+                                {'label' : " Preselected Variables", 'value' : 1},
+                                {'label' : " Custom Variable Selection", 'value' : 2}
                                 ]  ,
                             className = 'ps-4 p-3',
                             style = {
