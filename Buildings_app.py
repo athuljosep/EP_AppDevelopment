@@ -3721,7 +3721,10 @@ def EPVis_Button_TimeGeneratedData_Interaction(table_gen, column_gen, table_agg,
     Aggregated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Aggregated.pickle'),"rb")
     Aggregated_OutputVariable_Dict = pickle.load(Aggregated_Dict_file)
 
-    Data_DF = Generated_OutputVariable_Dict[table_gen][column_gen]
+    if table_gen is not None and column_gen is not None:
+        Data_DF = Generated_OutputVariable_Dict[table_gen][column_gen]
+    else:
+        Data_DF = pd.DataFrame()
 
     # Creating DF for plotting
     column_agg_new = []
@@ -3741,7 +3744,10 @@ def EPVis_Button_TimeGeneratedData_Interaction(table_gen, column_gen, table_agg,
     merged_df = pd.concat([time_list, Data_DF], axis=1)
 
     # Melting the dataframe for Plotly Express
-    variable_list = column_gen+column_agg_new
+    if column_gen is not None:
+        variable_list = column_gen+column_agg_new
+    else:
+        variable_list = column_agg_new
     melted_df = merged_df.melt(id_vars='Date', value_vars=variable_list, var_name='Variable', value_name='Value')
 
     # Plotting the time series using Plotly Express
