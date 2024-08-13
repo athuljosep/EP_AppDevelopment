@@ -3755,6 +3755,57 @@ def EPVis_Button_TimeGeneratedData_Interaction(table_gen, column_gen, table_agg,
 
     return figure
 
+@app.callback(
+    Output(component_id = 'EPVis_Graph_TimeSeries', component_property = 'figure',allow_duplicate = True),
+    State(component_id = 'EPVis_DropDown_GeneratedDataTables', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_GeneratedDataColumns', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_AggregatedDataTables', component_property = 'value'),
+    State(component_id = 'EPVis_DropDown_AggregatedDataColumns', component_property = 'value'),
+    Input(component_id = 'EPVis_Button_TimeGeneratedData', component_property = 'n_clicks'),
+    prevent_initial_call = True)
+def EPVis_Button_TimeGeneratedData_Interaction(table_gen, column_gen, table_agg, column_agg, n_clicks):
+    # Generated Data
+    Generated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Generated.pickle'),"rb")
+    Generated_OutputVariable_Dict = pickle.load(Generated_Dict_file)
+
+    # Aggregated Data
+    Aggregated_Dict_file = open(os.path.join(WORKSPACE_DIRECTORY,'Visualization','Aggregated.pickle'),"rb")
+    Aggregated_OutputVariable_Dict = pickle.load(Aggregated_Dict_file)
+
+    if table_gen is not None and column_gen is not None:
+        Data_DF = Generated_OutputVariable_Dict[table_gen][column_gen]
+    else:
+        Data_DF = pd.DataFrame()
+
+    # Creating DF for plotting
+    column_agg_new = []
+    for item in column_agg:
+        Current_DF = Aggregated_OutputVariable_Dict[item][table_agg].to_frame()
+        column_name = "".join([item, table_agg])
+        column_agg_new.append(column_name)
+        Current_DF = Current_DF.rename(columns={table_agg: column_name})
+        Data_DF = pd.concat([Data_DF, Current_DF], axis=1)
+
+    if column_gen is not None:
+        time_list = pd.DataFrame(Generated_OutputVariable_Dict['DateTime_List'], columns=['Date'])
+    elif column_agg is not None:
+        time_list = pd.DataFrame(Aggregated_OutputVariable_Dict['DateTime_List'], columns=['Date'])
+
+    # Merging the dataframes
+    merged_df = pd.concat([time_list, Data_DF], axis=1)
+
+    # Melting the dataframe for Plotly Express
+    if column_gen is not None:
+        variable_list = column_gen+column_agg_new
+    else:
+        variable_list = column_agg_new
+    melted_df = merged_df.melt(id_vars='Date', value_vars=variable_list, var_name='Variable', value_name='Value')
+
+    # Plotting the time series using Plotly Express
+    figure = px.line(melted_df, x='Date', y='Value', color='Variable', labels={'Date': 'Date', 'Value': 'Variable', 'Variable': 'Data Series'})
+
+    return figure
+
 # Running the App
 if __name__ == '__main__':
     app.run_server(port=4050)
