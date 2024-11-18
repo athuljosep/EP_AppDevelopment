@@ -75,14 +75,14 @@ OUR_VARIABLE_LIST = ['Schedule_Value_',
 # Themes - https://dash-bootstrap-components.opensource.faculty.ai/docs/themes/explorer/
 # hackerthemes.com/bootstrap-cheatsheet/
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.SOLAR])
+app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
 
 # App Layout using Dash Bootstrap
 
 app.layout = dbc.Container([
 
     dbc.Row([
-        html.H1("Buildings Data Analysis", className = 'text-center text-primary mb-4')
+        html.H1("EnergyPlus Simulation Management Tool", className = 'text-center text-primary mb-4')
     ]),
 
     dcc.Tabs([
@@ -1482,7 +1482,7 @@ def EPGen_Upload_EPW_Interaction(filename, content):
     Input(component_id = 'version_selection', component_property = 'value'),
     prevent_initial_call = True)
 def EPGen_Dropdown_EPVersion_Interaction(version_selection):
-    if version_selection != '' :
+    if version_selection != None :
         simulation_details = False
     else:
         simulation_details = True
@@ -3754,7 +3754,7 @@ def EPVis_Button_TimeGeneratedData_Interaction(table_gen, column_gen, table_agg,
     figure = px.line(melted_df, x='Date', y='Value', color='Variable', labels={'Date': 'Date', 'Value': 'Variable', 'Variable': 'Data Series'})
 
     return figure
-
+'''
 @app.callback(
     Output(component_id = 'EPVis_Graph_TimeSeries', component_property = 'figure',allow_duplicate = True),
     State(component_id = 'EPVis_DropDown_GeneratedDataTables', component_property = 'value'),
@@ -3805,7 +3805,7 @@ def EPVis_Button_TimeGeneratedData_Interaction(table_gen, column_gen, table_agg,
     figure = px.line(melted_df, x='Date', y='Value', color='Variable', labels={'Date': 'Date', 'Value': 'Variable', 'Variable': 'Data Series'})
 
     return figure
-
+'''
 # Running the App
 if __name__ == '__main__':
     app.run_server(port=4050)
