@@ -3806,6 +3806,7 @@ def EPVis_Button_TimeGeneratedData_Interaction(table_gen, column_gen, table_agg,
 
     return figure
 '''
+
 # Running the App
 if __name__ == '__main__':
     app.run_server(port=4050)
