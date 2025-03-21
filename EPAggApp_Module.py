@@ -168,6 +168,8 @@ def EPAgg_RadioButton_AggregationVariables_Interaction_Function(InputSelection, 
 
             shutil.copy(os.path.join(UPLOAD_DIRECTORY_AGG_EIO,item), os.path.join(Aggregation_FolderPath,'Eio_OutputFile.pickle'))
 
+    pre_list = []
+
     if VariableSelection == 1:
 
         modified_OUR_VARIABLE_LIST = []
@@ -233,6 +235,8 @@ def EPAgg_Button_Aggregate_Interaction_Function(variable_selection, custom_varia
     Eio_OutputFile_Dict = pickle.load(Eio_OutputFile_Dict_file)
 
     # Getting variable selection for aggregation
+    selected_variable_list = []
+
     if variable_selection == 1:  # Pre selected variables
 
         selected_variable_list = OUR_VARIABLE_LIST
@@ -742,7 +746,7 @@ def EPAgg_Button_Aggregate_Interaction_Function(variable_selection, custom_varia
     return "Aggregation Completed"
 
 def EPAgg_Button_Download_Interaction_Function(n_clicks):
-
+    download_path = []
     results_path = os.path.join(WORKSPACE_DIRECTORY, "Aggregation", "Results")
 
     for item in os.listdir(results_path):
